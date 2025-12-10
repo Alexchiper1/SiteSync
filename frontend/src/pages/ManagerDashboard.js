@@ -37,7 +37,7 @@ export default function ManagerDashboard() {
     loadSites();
   };
 
-  // ASSIGN TASK
+  // assign tasks 
   const createTask = async (site) => {
     const input = taskInputs[site._id];
     if (!input?.email || !input?.desc) return alert("Fill all fields");
@@ -57,7 +57,7 @@ export default function ManagerDashboard() {
     setTaskInputs({ ...taskInputs, [site._id]: { email: "", desc: "" } });
   };
 
-  // LOAD TASK LOG
+  //loads the task log
   const loadTaskLog = async (siteId) => {
     if (expandedSite === siteId) {
       setExpandedSite(null);

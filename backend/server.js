@@ -108,7 +108,7 @@ app.post("/join-site", async (req, res) => {
   }
 });
 
-// ✅ get sites joined by employee
+// get sites joined by employee
 app.get("/employee-sites/:email", async (req, res) => {
   await client.connect();
   const db = client.db("app");
@@ -137,7 +137,7 @@ app.post("/tasks", async (req, res) => {
   res.json({ msg: "Task created" });
 });
 
-// GET TASKS FOR EMPLOYEE
+//get the tasks for the employee
 app.get("/tasks/:employeeEmail", async (req, res) => {
   await client.connect();
   const db = client.db("app");

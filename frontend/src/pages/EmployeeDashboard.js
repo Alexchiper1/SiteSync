@@ -11,7 +11,7 @@ export default function EmployeeDashboard() {
   const [selectedSiteId, setSelectedSiteId] = useState(null);
   const [photos, setPhotos] = useState({});
 
-  // 🔹 Load joined sites
+  // loads the construction sitres
   const loadMySites = async () => {
     const res = await fetch(
       `http://localhost:5000/employee-sites/${user.email.trim().toLowerCase()}`
@@ -19,7 +19,7 @@ export default function EmployeeDashboard() {
     setMySites(await res.json());
   };
 
-  // 🔹 Load tasks
+  // loads the tasks
   const loadTasks = async () => {
     const res = await fetch(
       `http://localhost:5000/tasks/${user.email.trim().toLowerCase()}`
@@ -32,7 +32,7 @@ export default function EmployeeDashboard() {
     loadTasks();
   }, []);
 
-  // 🔍 Search sites
+  // able to search for a task
   const searchSites = async () => {
     if (!query.trim()) return;
 
@@ -40,7 +40,7 @@ export default function EmployeeDashboard() {
     setResults(await res.json());
   };
 
-  // ➕ Join site
+  // join a site
   const joinSite = async (siteId) => {
     const res = await fetch("http://localhost:5000/join-site", {
       method: "POST",
@@ -76,7 +76,7 @@ export default function EmployeeDashboard() {
     loadTasks();
   };
 
-  // ❌ Unable Task
+  // unable to complete task 
   const unableTask = async (taskId) => {
     const reason = prompt("Why are you unable to complete this task?");
     if (!reason) return;
