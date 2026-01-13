@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
+import "../css/Login.css";
 
 export default function Login() {
   const [users, setUsers] = useState([]);
@@ -30,7 +32,9 @@ export default function Login() {
   };
 
   return (
-    <div>
+    <>
+      <Logo />
+      <div className="form-container">
       <h2>Login</h2>
 
       <input
@@ -40,8 +44,6 @@ export default function Login() {
         onChange={e => setEmail(e.target.value)}
       />
 
-      <br />
-
       <input
         type="password"
         placeholder="Password"
@@ -49,14 +51,13 @@ export default function Login() {
         onChange={e => setPassword(e.target.value)}
       />
 
-      <br />
-
       <button onClick={handleLogin}>Login</button>
 
       <p>
-        Don’t have an account?
+        Don't have an account?
         <a href="/register"> Register</a>
       </p>
     </div>
+    </>
   );
 }
