@@ -183,6 +183,23 @@ app.get("/tasks-site/:siteId", async (req, res) => {
   res.json(tasks);
 });
 
+app.put("/tasks/:taskId", async (req, res) => {
+  await client.connect();
+  const db = client.db("app");
+
+  await db.collection("tasks").updateOne(
+    { _id: new ObjectId(req.params.taskId) },
+    {
+      $set: {
+        status: req.body.status,
+        employeeMessage: req.body.employeeMessage || ""
+      }
+    }
+  );
+
+  res.json({ msg: "Task updated" });
+});
+
 app.listen(5000, () => {
   console.log("Server running on 5000");
 });

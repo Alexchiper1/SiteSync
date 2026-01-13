@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
+import "../css/ManagerDashboard.css";
 
 export default function ManagerDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
 
   const [site, setSite] = useState({ name: "", location: "", joinKey: "" });
   const [sites, setSites] = useState([]);
@@ -69,70 +73,103 @@ export default function ManagerDashboard() {
     setExpandedSite(siteId);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   return (
-    <div>
-      <h1>Manager Dashboard</h1>
-      <p><strong>Company:</strong> {user.companyName}</p>
-
-      <h2>Create Site</h2>
-      <form onSubmit={createSite}>
-        <input placeholder="Site name" value={site.name} onChange={e => setSite({ ...site, name: e.target.value })} />
-        <input placeholder="Location" value={site.location} onChange={e => setSite({ ...site, location: e.target.value })} />
-        <input placeholder="Join Key" value={site.joinKey} onChange={e => setSite({ ...site, joinKey: e.target.value })} />
-        <button>Create Site</button>
-      </form>
-
-      <h2>My Sites</h2>
-
-      {sites.map(site => (
-        <div key={site._id} style={{ border: "1px solid #000", margin: 15, padding: 10 }}>
-          <strong>{site.name}</strong><br />
-          {site.location}
-
-          <h4>Assign Task</h4>
-          <input
-            placeholder="Employee email"
-            value={taskInputs[site._id]?.email || ""}
-            onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], email: e.target.value } })}
-          />
-          <input
-            placeholder="Task description"
-            value={taskInputs[site._id]?.desc || ""}
-            onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], desc: e.target.value } })}
-          />
-          <button onClick={() => createTask(site)}>Add Task</button>
-
-          <br /><br />
-          <button onClick={() => loadTaskLog(site._id)}>
-            {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
-          </button>
-
-          {expandedSite === site._id && taskLogs[site._id] && (
-            <div style={{ background: "#f5f5f5", marginTop: 10, padding: 10 }}>
-              {taskLogs[site._id].map(task => (
-                <div key={task._id} style={{ marginBottom: 10 }}>
-                  <strong>{task.employeeEmail}</strong> — {task.status}<br />
-                  {task.description}
-
-                  {task.image && (
-                    <div>
-                      <img
-                        src={`http://localhost:5000/uploads/${task.image}`}
-                        alt="proof"
-                        style={{ width: 200, marginTop: 5 }}
-                      />
-                    </div>
-                  )}
-
-                  {task.employeeMessage && (
-                    <p><strong>Message:</strong> {task.employeeMessage}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+    <>
+      <Logo />
+      <div className="manager-dashboard">
+      {/* Left Sidebar - Profile Card */}
+      <div className="profile-sidebar">
+        <div className="profile-card">
+          <div className="profile-avatar">
+            <img src="https://via.placeholder.com/80" alt="Profile" />
+          </div>
+          <h3 className="profile-name">{user?.name || "Manager"}</h3>
+          <p className="profile-role">Manager</p>
+          <p className="profile-details">{user?.email}</p>
+          <p className="profile-company"><strong>Company:</strong> {user?.companyName}</p>
+          <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
-      ))}
+      </div>
+
+      {/* Main Content Area */}
+      <div className="main-content">
+        <div className="dashboard-header">
+          <h1>Manager Dashboard</h1>
+        </div>
+
+        <div className="create-site-form">
+          <h2>Create Site</h2>
+          <form onSubmit={createSite}>
+            <div className="form-row">
+              <input placeholder="Site name" value={site.name} onChange={e => setSite({ ...site, name: e.target.value })} />
+              <input placeholder="Location" value={site.location} onChange={e => setSite({ ...site, location: e.target.value })} />
+              <input placeholder="Join Key" value={site.joinKey} onChange={e => setSite({ ...site, joinKey: e.target.value })} />
+              <button>Create Site</button>
+            </div>
+          </form>
+        </div>
+
+        <h2>My Sites</h2>
+
+        {sites.map(site => (
+          <div key={site._id} className="site-card">
+            <strong>{site.name}</strong>
+            <p>{site.location}</p>
+
+            <div className="task-section">
+              <h4>Assign Task</h4>
+              <div className="task-inputs">
+                <input
+                  placeholder="Employee email"
+                  value={taskInputs[site._id]?.email || ""}
+                  onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], email: e.target.value } })}
+                />
+                <input
+                  placeholder="Task description"
+                  value={taskInputs[site._id]?.desc || ""}
+                  onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], desc: e.target.value } })}
+                />
+                <button onClick={() => createTask(site)}>Add Task</button>
+              </div>
+
+              <button onClick={() => loadTaskLog(site._id)}>
+                {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
+              </button>
+
+              {expandedSite === site._id && taskLogs[site._id] && (
+                <div className="task-log">
+                  {taskLogs[site._id].map(task => (
+                    <div key={task._id} className="task-item">
+                      <strong>{task.employeeEmail}</strong>
+                      <span className={`status-badge status-${task.status}`}>{task.status}</span>
+                      <p>{task.description}</p>
+
+                      {task.image && (
+                        <div>
+                          <img
+                            src={`http://localhost:5000/uploads/${task.image}`}
+                            alt="proof"
+                          />
+                        </div>
+                      )}
+
+                      {task.employeeMessage && (
+                        <p><strong>Message:</strong> {task.employeeMessage}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
+    </>
   );
 }
