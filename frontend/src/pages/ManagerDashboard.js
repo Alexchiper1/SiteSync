@@ -80,7 +80,7 @@ export default function ManagerDashboard() {
 
   return (
     <>
-      <Logo />
+      
       <div className="manager-dashboard">
       {/* Left Sidebar - Profile Card */}
       <div className="profile-sidebar">

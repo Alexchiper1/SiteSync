@@ -38,10 +38,12 @@ export default function Register() {
 
   return (
     <>
-      <Logo />
+       <Logo />
+
       <div className="form-container">
-      <form onSubmit={submit}>
-        <h2>Register</h2>
+        <form onSubmit={submit}>
+          <h2>Register</h2>
+
 
         <input
           type="text"

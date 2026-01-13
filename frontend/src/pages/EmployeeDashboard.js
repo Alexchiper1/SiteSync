@@ -115,13 +115,13 @@ export default function EmployeeDashboard() {
 
   return (
     <>
-      <Logo />
+      
       <div className="employee-dashboard">
       {/* Left Sidebar - Profile Card */}
       <div className="profile-sidebar">
         <div className="profile-card">
           <div className="profile-avatar">
-            <img src="https://via.placeholder.com/80" alt="Profile" />
+            <img src="" alt="Profile" />
           </div>
           <h3 className="profile-name">{user?.name || "Employee"}</h3>
           <p className="profile-role">Construction Worker</p>
