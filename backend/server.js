@@ -36,10 +36,50 @@ app.get("/users", async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
-  await db.collection("users").insertOne(req.body);
-  res.json({ msg: "User added" });
+  try {
+    await client.connect();
+    const db = client.db("app");
+
+    const email = req.body.email.trim().toLowerCase();
+
+    // check if email already exists
+    const existingUser = await db.collection("users").findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({ msg: "Email already exists" });
+    }
+
+    await db.collection("users").insertOne({
+      name: req.body.name,
+      email,
+      password: req.body.password,
+      role: req.body.role,
+      companyName: req.body.companyName || ""
+    });
+
+    res.status(201).json({ msg: "User added" });
+
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db("app");
+
+    const email = req.body.email.trim().toLowerCase();
+    const user = await db.collection("users").findOne({ email });
+
+    if (!user || user.password !== req.body.password) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
 });
 
 // ---------------- SITES ----------------

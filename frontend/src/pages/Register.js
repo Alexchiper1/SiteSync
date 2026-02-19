@@ -32,7 +32,7 @@ export default function Register() {
       alert("Account created successfully! You can now login.");
       navigate("/");
     } else {
-      alert("Error creating account. Please try again.");
+      alert(data.msg);
     }
   };
 
