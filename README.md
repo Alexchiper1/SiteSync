@@ -42,7 +42,7 @@ Managers can:
 # Backend setup
 cd backend
 npm install
-npm run dev
+npm start
 
 # Frontend setup
 cd frontend
