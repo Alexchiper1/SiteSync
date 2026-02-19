@@ -63,7 +63,7 @@ export default function EmployeeDashboard() {
     }
   };
 
-  // ✅ COMPLETE TASK (REQUIRES PHOTO)
+  //COMPLETE TASK (REQUIRES PHOTO)
   const completeTask = async (taskId) => {
     if (!photos[taskId]) {
       alert("You must upload a photo before completing the task.");
