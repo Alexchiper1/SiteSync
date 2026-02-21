@@ -87,3 +87,28 @@ router.get("/employee-sites/:email", async (req, res) => {
 });
 
 export default router;
+
+// DELETE SITE
+router.delete("/sites/:siteId", async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db("app");
+
+    await db.collection("sites").deleteOne({
+      _id: new ObjectId(req.params.siteId)
+    });
+
+    await db.collection("siteMembers").deleteMany({
+      siteId: req.params.siteId
+    });
+
+    await db.collection("tasks").deleteMany({
+      siteId: req.params.siteId
+    });
+
+    res.json({ msg: "Site deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Error deleting site" });
+  }
+});
