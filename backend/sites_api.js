@@ -3,8 +3,7 @@ import { MongoClient, ObjectId } from "mongodb";
 
 const router = express.Router();
 
-const uri =
-  "mongodb+srv://sitesync:pass@cluster0.ehai0mf.mongodb.net/?appName=Cluster0";
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
 // ---------------- SITES ----------------
