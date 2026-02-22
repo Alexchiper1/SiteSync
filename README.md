@@ -1,5 +1,5 @@
 # SiteSync
-<<<<<<< HEAD
+
 
 SiteSync is a construction site check-in and management platform where managers can register companies, create job sites, and track employee check-ins via geolocation.
 
