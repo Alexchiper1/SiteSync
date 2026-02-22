@@ -1,4 +1,5 @@
 # SiteSync
+<<<<<<< HEAD
 
 SiteSync is a construction site check-in and management platform where managers can register companies, create job sites, and track employee check-ins via geolocation.
 
@@ -48,3 +49,6 @@ npm start
 cd frontend
 npm install
 npm start
+=======
+Temporary update for version control demonstration
+>>>>>>> alex
