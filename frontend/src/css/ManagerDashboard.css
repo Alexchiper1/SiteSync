@@ -6,6 +6,7 @@
   padding: 20px;
   padding-top: 80px;
 }
+
 .profile-sidebar {
   width: 300px;
   flex-shrink: 0;
@@ -85,6 +86,7 @@
 }
 
 /* Main Content Area */
+
 .main-content {
   flex: 1;
   min-width: 0;
@@ -253,54 +255,34 @@
   font-size: 22px;
   font-weight: 600;
 }
-/* Create Site */
-.create-site-grid {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 16px;
-  align-items: start;
-}
 
-.create-site-left {
-  display: flex;
-  flex-direction: column;
-}
+/* Attendance table (Manager Dashboard) */
 
-.create-site-right {
-  min-width: 0;
-}
-.coords-pill {
-  padding: 10px 12px;
-  border: 1px dashed #d1d5db;
-  border-radius: 10px;
-  background: #f9fafb;
-  color: #4b5563;
-  font-size: 14px;
-  margin-bottom: 12px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.coords-pill strong {
-  color: #111827;
-}
-
-.create-site-btn {
-  width: 100%;
-  margin-top: 0;
-}
-@media (max-width: 900px) {
-  .create-site-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.delete-site-btn {
+.attendance-table {
   margin-top: 12px;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.delete-site-btn:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+.attendance-header,
+.attendance-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.8fr 0.8fr;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.attendance-header {
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.attendance-row {
+  background: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.attendance-row:last-child {
+  border-bottom: none;
 }

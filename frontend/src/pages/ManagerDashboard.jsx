@@ -9,24 +9,36 @@ export default function ManagerDashboard() {
   const navigate = useNavigate();
 
   const [site, setSite] = useState({
-  name: "",
-  location: "",
-  joinKey: "",
-  radiusMeters: "150",
-  coords: null
+    name: "",
+    location: "",
+    joinKey: "",
+    radiusMeters: "150",
+    coords: null
   });
   const [sites, setSites] = useState([]);
   const [taskInputs, setTaskInputs] = useState({});
   const [taskLogs, setTaskLogs] = useState({});
   const [expandedSite, setExpandedSite] = useState(null);
 
+  // --- attendance ---
+  const [attendance, setAttendance] = useState([]);
+
   const loadSites = async () => {
     const res = await fetch(`http://localhost:5000/sites/${user.email}`);
     setSites(await res.json());
   };
 
+  const loadAttendance = async () => {
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    const res = await fetch(
+      `http://localhost:5000/attendance/manager/${user.email}?date=${today}`
+    );
+    setAttendance(await res.json());
+  };
+
   useEffect(() => {
     loadSites();
+    loadAttendance();
   }, []);
 
   // CREATE SITE
@@ -68,19 +80,20 @@ export default function ManagerDashboard() {
   };
 
   const deleteSite = async (siteId) => {
-  const confirmDelete = window.confirm("Delete this site?");
-  if (!confirmDelete) return;
+    const confirmDelete = window.confirm("Delete this site?");
+    if (!confirmDelete) return;
 
-  const res = await fetch(`http://localhost:5000/sites/${siteId}`, {
-    method: "DELETE"
-  });
+    const res = await fetch(`http://localhost:5000/sites/${siteId}`, {
+      method: "DELETE"
+    });
 
-  const data = await res.json();
-  alert(data.msg);
+    const data = await res.json();
+    alert(data.msg);
 
-  loadSites();
+    loadSites();
   };
-  // assign tasks 
+
+  // assign tasks
   const createTask = async (site) => {
     const input = taskInputs[site._id];
     if (!input?.email || !input?.desc) return alert("Fill all fields");
@@ -119,144 +132,221 @@ export default function ManagerDashboard() {
 
   return (
     <>
-      
       <div className="manager-dashboard">
-      {/* Left Sidebar - Profile Card */}
-      <div className="profile-sidebar">
-        <div className="profile-card">
-          <div className="profile-avatar">
-            <img src="https://via.placeholder.com/80" alt="Profile" />
-          </div>
-          <h3 className="profile-name">{user?.name || "Manager"}</h3>
-          <p className="profile-role">Manager</p>
-          <p className="profile-details">{user?.email}</p>
-          <p className="profile-company"><strong>Company:</strong> {user?.companyName}</p>
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="main-content">
-        <div className="dashboard-header">
-          <h1>Manager Dashboard</h1>
-        </div>
-        <div className="create-site-form">
-          <h2>Create Site</h2>
-          <form onSubmit={createSite} className="create-site-grid">
-          {/* LEFT: inputs */}
-          <div className="create-site-left">
-
-            <input
-              placeholder="Site name"
-              value={site.name}
-              onChange={(e) => setSite({ ...site, name: e.target.value })}
-            />
-            <input
-              placeholder="Address / Location name"
-              value={site.location}
-              onChange={(e) => setSite({ ...site, location: e.target.value })}
-            />
-            <input
-              placeholder="Radius meters (e.g. 150)"
-              value={site.radiusMeters}
-              onChange={(e) => setSite({ ...site, radiusMeters: e.target.value })}
-            />
-            <div className="coords-pill">
-              {site.coords ? (
-                <>
-                  <span>Selected:</span>
-                  <strong>
-                    {site.coords.lat.toFixed(6)}, {site.coords.lng.toFixed(6)}
-                  </strong>
-                </>
-              ) : (
-                <span>Click the map to set the exact site location</span>
-              )}
+        {/* Left Sidebar - Profile Card */}
+        <div className="profile-sidebar">
+          <div className="profile-card">
+            <div className="profile-avatar">
+              <img src="https://via.placeholder.com/80" alt="Profile" />
             </div>
-            <input
-              placeholder="Join Key"
-              value={site.joinKey}
-              onChange={(e) => setSite({ ...site, joinKey: e.target.value })}
-            />
-            <button className="create-site-btn" type="submit">
-              Create Site
+            <h3 className="profile-name">{user?.name || "Manager"}</h3>
+            <p className="profile-role">Manager</p>
+            <p className="profile-details">{user?.email}</p>
+            <p className="profile-company">
+              <strong>Company:</strong> {user?.companyName}
+            </p>
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
             </button>
           </div>
-          {/* RIGHT: map */}
-          <div className="create-site-right">
-            <MapPicker
-              value={site.coords}
-              onChange={(coords) => setSite({ ...site, coords })}
-              height={260}
-              defaultZoom={14}
-            />
-          </div>
-
-        </form>
         </div>
 
-        <h2>My Sites</h2>
+        {/* Main Content Area */}
+        <div className="main-content">
+          <div className="dashboard-header">
+            <h1>Manager Dashboard</h1>
+          </div>
 
-        {sites.map(site => (
-          <div key={site._id} className="site-card">
-            <strong>{site.name}</strong>
-            <p>{site.location}</p>
+          {/* TODAY'S CHECK-INS */}
+          <div className="create-site-form" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ margin: 0 }}>Today's Check-Ins</h2>
+              <button onClick={loadAttendance} style={{ height: 36 }}>
+                Refresh
+              </button>
+            </div>
 
-            <button
-              className="delete-site-btn"
-              onClick={() => deleteSite(site._id)}>
-              Delete Site
-            </button>
-
-            <div className="task-section">
-              <h4>Assign Task</h4>
-              <div className="task-inputs">
-                <input
-                  placeholder="Employee email"
-                  value={taskInputs[site._id]?.email || ""}
-                  onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], email: e.target.value } })}
-                />
-                <input
-                  placeholder="Task description"
-                  value={taskInputs[site._id]?.desc || ""}
-                  onChange={e => setTaskInputs({ ...taskInputs, [site._id]: { ...taskInputs[site._id], desc: e.target.value } })}
-                />
-                <button onClick={() => createTask(site)}>Add Task</button>
+            <div className="attendance-table">
+              <div className="attendance-header">
+                <span><strong>Employee</strong></span>
+                <span><strong>Site</strong></span>
+                <span><strong>Check In</strong></span>
+                <span><strong>Check Out</strong></span>
               </div>
 
-              <button onClick={() => loadTaskLog(site._id)}>
-                {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
-              </button>
-
-              {expandedSite === site._id && taskLogs[site._id] && (
-                <div className="task-log">
-                  {taskLogs[site._id].map(task => (
-                    <div key={task._id} className="task-item">
-                      <strong>{task.employeeEmail}</strong>
-                      <span className={`status-badge status-${task.status}`}>{task.status}</span>
-                      <p>{task.description}</p>
-
-                      {task.image && (
-                        <div>
-                          <img
-                            src={`http://localhost:5000/uploads/${task.image}`}
-                            alt="proof"
-                          />
-                        </div>
-                      )}
-
-                      {task.employeeMessage && (
-                        <p><strong>Message:</strong> {task.employeeMessage}</p>
-                      )}
-                    </div>
-                  ))}
+              {attendance.length === 0 ? (
+                <div className="attendance-row">
+                  <span>No check-ins yet today.</span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
                 </div>
+              ) : (
+                attendance.map((row) => (
+                  <div key={row._id} className="attendance-row">
+                    <span>{row.employeeName}</span>
+                    <span>{row.siteName}</span>
+                    <span>
+                      {new Date(row.checkInAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </span>
+                    <span>
+                      {row.checkOutAt
+                        ? new Date(row.checkOutAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })
+                        : "—"}
+                    </span>
+                  </div>
+                ))
               )}
             </div>
           </div>
-        ))}
+
+          {/* CREATE SITE */}
+          <div className="create-site-form">
+            <h2>Create Site</h2>
+            <form onSubmit={createSite} className="create-site-grid">
+              {/* LEFT: inputs */}
+              <div className="create-site-left">
+                <input
+                  placeholder="Site name"
+                  value={site.name}
+                  onChange={(e) => setSite({ ...site, name: e.target.value })}
+                />
+                <input
+                  placeholder="Address / Location name"
+                  value={site.location}
+                  onChange={(e) =>
+                    setSite({ ...site, location: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Radius meters (e.g. 150)"
+                  value={site.radiusMeters}
+                  onChange={(e) =>
+                    setSite({ ...site, radiusMeters: e.target.value })
+                  }
+                />
+                <div className="coords-pill">
+                  {site.coords ? (
+                    <>
+                      <span>Selected:</span>
+                      <strong>
+                        {site.coords.lat.toFixed(6)}, {site.coords.lng.toFixed(6)}
+                      </strong>
+                    </>
+                  ) : (
+                    <span>Click the map to set the exact site location</span>
+                  )}
+                </div>
+                <input
+                  placeholder="Join Key"
+                  value={site.joinKey}
+                  onChange={(e) => setSite({ ...site, joinKey: e.target.value })}
+                />
+                <button className="create-site-btn" type="submit">
+                  Create Site
+                </button>
+              </div>
+              {/* RIGHT: map */}
+              <div className="create-site-right">
+                <MapPicker
+                  value={site.coords}
+                  onChange={(coords) => setSite({ ...site, coords })}
+                  height={260}
+                  defaultZoom={14}
+                />
+              </div>
+            </form>
+          </div>
+
+          <h2>My Sites</h2>
+
+          {sites.map((site) => (
+            <div key={site._id} className="site-card">
+              <strong>{site.name}</strong>
+              <p>{site.location}</p>
+
+              <button
+                className="delete-site-btn"
+                onClick={() => deleteSite(site._id)}
+              >
+                Delete Site
+              </button>
+
+              <div className="task-section">
+                <h4>Assign Task</h4>
+                <div className="task-inputs">
+                  <input
+                    placeholder="Employee email"
+                    value={taskInputs[site._id]?.email || ""}
+                    onChange={(e) =>
+                      setTaskInputs({
+                        ...taskInputs,
+                        [site._id]: {
+                          ...taskInputs[site._id],
+                          email: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <input
+                    placeholder="Task description"
+                    value={taskInputs[site._id]?.desc || ""}
+                    onChange={(e) =>
+                      setTaskInputs({
+                        ...taskInputs,
+                        [site._id]: {
+                          ...taskInputs[site._id],
+                          desc: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <button onClick={() => createTask(site)}>Add Task</button>
+                </div>
+
+                <button onClick={() => loadTaskLog(site._id)}>
+                  {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
+                </button>
+
+                {expandedSite === site._id && taskLogs[site._id] && (
+                  <div className="task-log">
+                    {taskLogs[site._id].map((task) => (
+                      <div key={task._id} className="task-item">
+                        <strong>{task.employeeEmail}</strong>
+                        <span className={`status-badge status-${task.status}`}>
+                          {task.status}
+                        </span>
+                        <p>{task.description}</p>
+
+                        {task.image && (
+                          <div>
+                            <img
+                              src={`http://localhost:5000/uploads/${task.image}`}
+                              alt="proof"
+                            />
+                          </div>
+                        )}
+
+                        {task.employeeMessage && (
+                          <p>
+                            <strong>Message:</strong> {task.employeeMessage}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
     </>
   );
 }
