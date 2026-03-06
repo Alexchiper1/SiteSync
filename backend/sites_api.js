@@ -29,6 +29,25 @@ router.get("/sites/:managerEmail", async (req, res) => {
   res.json(sites);
 });
 
+// get one site by id (for employee map/check-in)
+router.get("/site/:siteId", async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db("app");
+
+    const site = await db.collection("sites").findOne({
+      _id: new ObjectId(req.params.siteId)
+    });
+
+    if (!site) return res.status(404).json({ msg: "Site not found" });
+
+    res.json(site);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Error fetching site" });
+  }
+});
+
 // search sites
 router.get("/sites-search/:query", async (req, res) => {
   await client.connect();
@@ -85,8 +104,6 @@ router.get("/employee-sites/:email", async (req, res) => {
   res.json(sites);
 });
 
-export default router;
-
 // DELETE SITE
 router.delete("/sites/:siteId", async (req, res) => {
   try {
@@ -111,3 +128,5 @@ router.delete("/sites/:siteId", async (req, res) => {
     res.status(500).json({ msg: "Error deleting site" });
   }
 });
+
+export default router;
