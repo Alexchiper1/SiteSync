@@ -22,17 +22,15 @@ if (hasCloudinaryConfig) {
   });
 }
 
-const localDiskStorage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
-
 // Vercel functions run on a read-only filesystem, so never initialize disk storage there.
 const storage = hasCloudinaryConfig || isVercel
   ? multer.memoryStorage()
-  : localDiskStorage;
+  : multer.diskStorage({
+      destination: "uploads/",
+      filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+      }
+    });
 
 export const upload = multer({ storage });
 export { cloudinary, hasCloudinaryConfig, isVercel };
