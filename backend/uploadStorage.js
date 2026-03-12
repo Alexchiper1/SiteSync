@@ -12,6 +12,7 @@ const hasCloudinaryConfig =
   Boolean(CLOUDINARY_CLOUD_NAME) &&
   Boolean(CLOUDINARY_API_KEY) &&
   Boolean(CLOUDINARY_API_SECRET);
+const isVercel = Boolean(process.env.VERCEL);
 
 if (hasCloudinaryConfig) {
   cloudinary.config({
@@ -28,7 +29,10 @@ const localDiskStorage = multer.diskStorage({
   }
 });
 
-const storage = hasCloudinaryConfig ? multer.memoryStorage() : localDiskStorage;
+// Vercel functions run on a read-only filesystem, so never initialize disk storage there.
+const storage = hasCloudinaryConfig || isVercel
+  ? multer.memoryStorage()
+  : localDiskStorage;
 
 export const upload = multer({ storage });
-export { cloudinary, hasCloudinaryConfig };
+export { cloudinary, hasCloudinaryConfig, isVercel };
