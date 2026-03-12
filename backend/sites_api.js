@@ -1,25 +1,21 @@
 import express from "express";
-import { MongoClient, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
+import { getDb } from "./db.js";
 
 const router = express.Router();
-
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
 
 // ---------------- SITES ----------------
 
 // create site
 router.post("/sites", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
   await db.collection("sites").insertOne(req.body);
   res.status(201).json({ msg: "Site created" });
 });
 
 // get sites for manager
 router.get("/sites/:managerEmail", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   const sites = await db
     .collection("sites")
@@ -31,8 +27,7 @@ router.get("/sites/:managerEmail", async (req, res) => {
 
 // search sites
 router.get("/sites-search/:query", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   const sites = await db
     .collection("sites")
@@ -47,8 +42,7 @@ router.post("/join-site", async (req, res) => {
   try {
     const { siteId, joinKey, employeeEmail } = req.body;
 
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     const site = await db.collection("sites").findOne({
       _id: new ObjectId(siteId),
@@ -74,8 +68,7 @@ router.post("/join-site", async (req, res) => {
 
 // get sites joined by employee
 router.get("/employee-sites/:email", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   const sites = await db
     .collection("siteMembers")
@@ -90,8 +83,7 @@ export default router;
 // DELETE SITE
 router.delete("/sites/:siteId", async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     await db.collection("sites").deleteOne({
       _id: new ObjectId(req.params.siteId)
