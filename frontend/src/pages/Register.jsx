@@ -28,16 +28,23 @@ export default function Register() {
         body: JSON.stringify(newUser)
       });
 
-      const data = await response.json();
+      const raw = await response.text();
+      let data = {};
+
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = { msg: raw };
+      }
 
       if (response.ok) {
         alert("Account created successfully! You can now login.");
         navigate("/");
       } else {
-        alert(data.msg || "Unable to create account.");
+        alert(data.msg || `Unable to create account. Status ${response.status}`);
       }
     } catch (error) {
-      alert("Create account failed. Check the deployed API and Vercel environment variables.");
+      alert(`Create account failed: ${error.message}`);
     }
   };
 

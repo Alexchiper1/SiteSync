@@ -13,6 +13,10 @@ router.get("/users", async (req, res) => {
 
 router.post("/users", async (req, res) => {
   try {
+    if (!req.body?.name || !req.body?.email || !req.body?.password || !req.body?.role) {
+      return res.status(400).json({ msg: "Missing required registration fields" });
+    }
+
     const db = await getDb();
 
     const email = req.body.email.trim().toLowerCase();
@@ -34,7 +38,8 @@ router.post("/users", async (req, res) => {
 
     res.status(201).json({ msg: "User added" });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    console.error("POST /users failed:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
   }
 });
 
