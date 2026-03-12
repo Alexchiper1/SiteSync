@@ -1,6 +1,7 @@
 {
   "name": "sitesync",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev:frontend": "npm --prefix frontend start",
     "dev:backend": "npm --prefix backend run dev",
@@ -8,5 +9,14 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0",
+    "multer": "^2.1.1",
+    "multer-storage-cloudinary": "^4.0.0"
   }
 }

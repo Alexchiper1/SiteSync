@@ -1,27 +1,15 @@
 import express from "express";
-import { MongoClient, ObjectId } from "mongodb";
-import multer from "multer";
+import { ObjectId } from "mongodb";
+import { getDb } from "./db.js";
+import { upload } from "./uploadStorage.js";
 
 const router = express.Router();
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
-
-/*Add storage */
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
 
 // ---------------- TASKS ----------------
 
 // CREATE TASK
 router.post("/tasks", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   await db.collection("tasks").insertOne({
     siteId: req.body.siteId,
@@ -37,8 +25,7 @@ router.post("/tasks", async (req, res) => {
 
 //get the tasks for the employee
 router.get("/tasks/:employeeEmail", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   const tasks = await db.collection("tasks")
     .find({ employeeEmail: req.params.employeeEmail })
@@ -50,15 +37,18 @@ router.get("/tasks/:employeeEmail", async (req, res) => {
 //update whether task is complete or not
 router.put("/tasks-complete/:taskId", upload.single("photo"), async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db("app");
+    if (!req.file) {
+      return res.status(400).json({ msg: "Photo upload is required" });
+    }
+
+    const db = await getDb();
 
     await db.collection("tasks").updateOne(
       { _id: new ObjectId(req.params.taskId) },
       {
         $set: {
           status: "completed",
-          image: req.file.filename
+          image: req.file?.path || req.file?.filename || ""
         }
       }
     );
@@ -71,8 +61,7 @@ router.put("/tasks-complete/:taskId", upload.single("photo"), async (req, res) =
 
 // get the tasks for manager to view
 router.get("/tasks-site/:siteId", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   const tasks = await db.collection("tasks")
     .find({ siteId: req.params.siteId })
@@ -82,8 +71,7 @@ router.get("/tasks-site/:siteId", async (req, res) => {
 });
 
 router.put("/tasks/:taskId", async (req, res) => {
-  await client.connect();
-  const db = client.db("app");
+  const db = await getDb();
 
   await db.collection("tasks").updateOne(
     { _id: new ObjectId(req.params.taskId) },
