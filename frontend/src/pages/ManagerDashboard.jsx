@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
 

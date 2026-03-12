@@ -1,0 +1,12 @@
+{
+  "name": "sitesync",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend start",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
