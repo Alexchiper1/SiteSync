@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/EmployeeDashboard.css";
+import { apiUrl } from "../lib/api";
 
 export default function EmployeeDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -14,37 +15,37 @@ export default function EmployeeDashboard() {
   const [photos, setPhotos] = useState({});
 
   // loads the construction sites
-  const loadMySites = async () => {
+  const loadMySites = useCallback(async () => {
     const res = await fetch(
-      `http://localhost:5000/employee-sites/${user.email.trim().toLowerCase()}`
+      apiUrl(`/employee-sites/${user.email.trim().toLowerCase()}`)
     );
     setMySites(await res.json());
-  };
+  }, [user.email]);
 
   // loads the tasks
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     const res = await fetch(
-      `http://localhost:5000/tasks/${user.email.trim().toLowerCase()}`
+      apiUrl(`/tasks/${user.email.trim().toLowerCase()}`)
     );
     setTasks(await res.json());
-  };
+  }, [user.email]);
 
   useEffect(() => {
     loadMySites();
     loadTasks();
-  }, []);
+  }, [loadMySites, loadTasks]);
 
   // able to search for a task
   const searchSites = async () => {
     if (!query.trim()) return;
 
-    const res = await fetch(`http://localhost:5000/sites-search/${query}`);
+    const res = await fetch(apiUrl(`/sites-search/${query}`));
     setResults(await res.json());
   };
 
   // join a site
   const joinSite = async (siteId) => {
-    const res = await fetch("http://localhost:5000/join-site", {
+    const res = await fetch(apiUrl("/join-site"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -72,7 +73,7 @@ export default function EmployeeDashboard() {
     const formData = new FormData();
     formData.append("photo", photos[taskId]);
 
-    await fetch(`http://localhost:5000/tasks-complete/${taskId}`, {
+    await fetch(apiUrl(`/tasks-complete/${taskId}`), {
       method: "PUT",
       body: formData
     });
@@ -86,7 +87,7 @@ export default function EmployeeDashboard() {
     const reason = prompt("Why are you unable to complete this task?");
     if (!reason) return;
 
-    await fetch(`http://localhost:5000/tasks/${taskId}`, {
+    await fetch(apiUrl(`/tasks/${taskId}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
+import { apiUrl, taskImageUrl } from "../lib/api";
 
 export default function ManagerDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -19,14 +20,14 @@ export default function ManagerDashboard() {
   const [taskLogs, setTaskLogs] = useState({});
   const [expandedSite, setExpandedSite] = useState(null);
 
-  const loadSites = async () => {
-    const res = await fetch(`http://localhost:5000/sites/${user.email}`);
+  const loadSites = useCallback(async () => {
+    const res = await fetch(apiUrl(`/sites/${user.email}`));
     setSites(await res.json());
-  };
+  }, [user.email]);
 
   useEffect(() => {
     loadSites();
-  }, []);
+  }, [loadSites]);
 
   // CREATE SITE
   const createSite = async (e) => {
@@ -46,7 +47,7 @@ export default function ManagerDashboard() {
       return;
     }
 
-    const res = await fetch("http://localhost:5000/sites", {
+    const res = await fetch(apiUrl("/sites"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -70,7 +71,7 @@ export default function ManagerDashboard() {
   const confirmDelete = window.confirm("Delete this site?");
   if (!confirmDelete) return;
 
-  const res = await fetch(`http://localhost:5000/sites/${siteId}`, {
+  const res = await fetch(apiUrl(`/sites/${siteId}`), {
     method: "DELETE"
   });
 
@@ -84,7 +85,7 @@ export default function ManagerDashboard() {
     const input = taskInputs[site._id];
     if (!input?.email || !input?.desc) return alert("Fill all fields");
 
-    await fetch("http://localhost:5000/tasks", {
+    await fetch(apiUrl("/tasks"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -106,7 +107,7 @@ export default function ManagerDashboard() {
       return;
     }
 
-    const res = await fetch(`http://localhost:5000/tasks-site/${siteId}`);
+    const res = await fetch(apiUrl(`/tasks-site/${siteId}`));
     setTaskLogs({ ...taskLogs, [siteId]: await res.json() });
     setExpandedSite(siteId);
   };
@@ -238,7 +239,7 @@ export default function ManagerDashboard() {
                       {task.image && (
                         <div>
                           <img
-                            src={`http://localhost:5000/uploads/${task.image}`}
+                            src={taskImageUrl(task.image)}
                             alt="proof"
                           />
                         </div>

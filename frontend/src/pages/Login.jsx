@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Login.css";
+import { apiUrl } from "../lib/api";
 
 export default function Login() {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/users")
+    fetch(apiUrl("/users"))
       .then(res => res.json())
       .then(data => setUsers(data));
   }, []);

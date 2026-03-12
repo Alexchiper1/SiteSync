@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Register.css";
+import { apiUrl } from "../lib/api";
 
 export default function Register() {
   const [role, setRole] = useState("employee");
@@ -20,7 +21,7 @@ export default function Register() {
     };
 
 
-    const response = await fetch("http://localhost:5000/users", {
+    const response = await fetch(apiUrl("/users"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newUser)
