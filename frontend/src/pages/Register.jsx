@@ -21,19 +21,23 @@ export default function Register() {
     };
 
 
-    const response = await fetch(apiUrl("/users"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newUser)
-    });
+    try {
+      const response = await fetch(apiUrl("/users"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser)
+      });
 
-    const data = await response.json();
-    
-    if (response.ok) {
-      alert("Account created successfully! You can now login.");
-      navigate("/");
-    } else {
-      alert(data.msg);
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Account created successfully! You can now login.");
+        navigate("/");
+      } else {
+        alert(data.msg || "Unable to create account.");
+      }
+    } catch (error) {
+      alert("Create account failed. Check the deployed API and Vercel environment variables.");
     }
   };
 
