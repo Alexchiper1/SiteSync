@@ -1,9 +1,31 @@
 import express from "express";
 import { ObjectId } from "mongodb";
 import { getDb } from "./db.js";
-import { upload } from "./uploadStorage.js";
+import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
 
 const router = express.Router();
+
+function uploadTaskPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "sitesync/tasks",
+        resource_type: "image",
+        public_id: `${Date.now()}-${file.originalname.replace(/\s+/g, "-")}`
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(result?.secure_url || result?.url || "");
+      }
+    );
+
+    uploadStream.end(file.buffer);
+  });
+}
 
 // ---------------- TASKS ----------------
 
@@ -42,13 +64,16 @@ router.put("/tasks-complete/:taskId", upload.single("photo"), async (req, res) =
     }
 
     const db = await getDb();
+    const imagePath = hasCloudinaryConfig
+      ? await uploadTaskPhoto(req.file)
+      : req.file?.path || req.file?.filename || "";
 
     await db.collection("tasks").updateOne(
       { _id: new ObjectId(req.params.taskId) },
       {
         $set: {
           status: "completed",
-          image: req.file?.path || req.file?.filename || ""
+          image: imagePath
         }
       }
     );
