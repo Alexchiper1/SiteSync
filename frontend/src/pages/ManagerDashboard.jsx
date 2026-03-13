@@ -324,7 +324,7 @@ export default function ManagerDashboard() {
               <MapPicker
                 value={site.coords}
                 onChange={(coords) => setSite({ ...site, coords })}
-                height={260}
+                size={320}
                 defaultZoom={14}
               />
             </div>

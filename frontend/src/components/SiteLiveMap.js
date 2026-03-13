@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, Marker, Circle } from "react-leaflet";
 
-export default function SiteLiveMap({ site, userPos, height = 320, zoom = 15 }) {
+export default function SiteLiveMap({ site, userPos, size = 320, zoom = 15 }) {
   if (!site?.lat || !site?.lng) return null;
 
   const siteCenter = [site.lat, site.lng];
@@ -12,14 +12,19 @@ export default function SiteLiveMap({ site, userPos, height = 320, zoom = 15 }) 
   return (
     <div
       style={{
-        width: "100%",
-        height,
+        width: `${size}px`,
+        height: `${size}px`,
         borderRadius: 12,
         overflow: "hidden",
-        border: "1px solid #e5e7eb"
+        border: "1px solid #e5e7eb",
+        margin: "0 auto"
       }}
     >
-      <MapContainer center={siteCenter} zoom={zoom} style={{ width: "100%", height: "100%" }}>
+      <MapContainer
+        center={siteCenter}
+        zoom={zoom}
+        style={{ width: "100%", height: "100%" }}
+      >
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

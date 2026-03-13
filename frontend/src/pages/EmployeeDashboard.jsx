@@ -363,7 +363,7 @@ export default function EmployeeDashboard() {
           {selectedSite && (
             <>
               <div style={{ marginTop: 12 }}>
-                <SiteLiveMap site={selectedSite} userPos={userPos} height={280} />
+                <SiteLiveMap site={selectedSite} userPos={userPos} size={320} />
               </div>
 
               <p style={{ marginTop: 10 }}>
