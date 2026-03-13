@@ -28,14 +28,15 @@ router.get("/sites/:managerEmail", async (req, res) => {
 // get one site by id (for employee map/check-in)
 router.get("/site/:siteId", async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     const site = await db.collection("sites").findOne({
       _id: new ObjectId(req.params.siteId)
     });
 
-    if (!site) return res.status(404).json({ msg: "Site not found" });
+    if (!site) {
+      return res.status(404).json({ msg: "Site not found" });
+    }
 
     res.json(site);
   } catch (err) {
