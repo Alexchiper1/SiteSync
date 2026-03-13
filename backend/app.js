@@ -5,18 +5,22 @@ import cors from "cors";
 import usersAPI from "./users_api.js";
 import sitesAPI from "./sites_api.js";
 import tasksAPI from "./tasks_api.js";
+import attendanceAPI from "./attendance_api.js";
 
 const app = express();
 const api = express.Router();
+const allowedOrigins = new Set(
+  [
+    "http://localhost:3000",
+    process.env.FRONTEND_URL,
+    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`
+  ].filter(Boolean)
+);
 
 app.use(
   cors({
     origin(origin, callback) {
-      const isLocalhost = origin?.startsWith("http://localhost:");
-      const isVercelDomain = origin?.endsWith(".vercel.app");
-      const matchesConfiguredFrontend = origin === process.env.FRONTEND_URL;
-
-      if (!origin || isLocalhost || isVercelDomain || matchesConfiguredFrontend) {
+      if (!origin || allowedOrigins.has(origin)) {
         return callback(null, true);
       }
 
@@ -30,6 +34,7 @@ app.use("/uploads", express.static("uploads"));
 api.use(usersAPI);
 api.use(sitesAPI);
 api.use(tasksAPI);
+api.use(attendanceAPI);
 
 app.use(api);
 app.use("/api", api);
