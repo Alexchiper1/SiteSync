@@ -16,6 +16,7 @@ export default function EmployeeDashboard() {
   const [tasks, setTasks] = useState([]);
   const [photos, setPhotos] = useState({});
 
+  // attendance states
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedSite, setSelectedSite] = useState(null);
   const [userPos, setUserPos] = useState(null);
@@ -42,12 +43,16 @@ export default function EmployeeDashboard() {
     loadTasks();
   }, [loadMySites, loadTasks]);
 
+  // GPS live location
   useEffect(() => {
     if (!navigator.geolocation) return;
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setUserPos({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        });
       },
       (err) => {
         console.warn(err);
@@ -58,6 +63,7 @@ export default function EmployeeDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  // load selected site details
   useEffect(() => {
     const loadSite = async () => {
       if (!selectedSiteId) {
@@ -71,11 +77,13 @@ export default function EmployeeDashboard() {
       const res = await fetch(apiUrl(`/site/${selectedSiteId}`));
       const site = await res.json();
       setSelectedSite(site);
+      setCheckedIn(false);
     };
 
     loadSite();
   }, [selectedSiteId]);
 
+  // compute distance to site
   useEffect(() => {
     if (!selectedSite?.lat || !selectedSite?.lng || !userPos?.lat || !userPos?.lng) {
       setDistance(null);
@@ -83,13 +91,20 @@ export default function EmployeeDashboard() {
       return;
     }
 
-    const d = haversineMeters(userPos.lat, userPos.lng, selectedSite.lat, selectedSite.lng);
+    const d = haversineMeters(
+      userPos.lat,
+      userPos.lng,
+      selectedSite.lat,
+      selectedSite.lng
+    );
+
     setDistance(d);
 
     const radius = Number(selectedSite.radiusMeters ?? 100);
     setIsWithin(d <= radius);
   }, [selectedSite, userPos]);
 
+  // search sites
   const searchSites = async () => {
     if (!query.trim()) return;
 
@@ -97,6 +112,7 @@ export default function EmployeeDashboard() {
     setResults(await res.json());
   };
 
+  // join site
   const joinSite = async (siteId) => {
     const res = await fetch(apiUrl("/join-site"), {
       method: "POST",
@@ -110,15 +126,24 @@ export default function EmployeeDashboard() {
 
     const data = await res.json();
     alert(data.msg);
+
     if (data.msg === "Joined site successfully") {
       loadMySites();
       loadTasks();
     }
   };
 
+  // CHECK IN
   const doCheckIn = async () => {
-    if (!selectedSiteId) return alert("Select a site first.");
-    if (!userPos) return alert("Please allow location access (GPS).");
+    if (!selectedSiteId) {
+      alert("Select a site first.");
+      return;
+    }
+
+    if (!userPos) {
+      alert("Please allow location access (GPS).");
+      return;
+    }
 
     const res = await fetch(apiUrl("/attendance/check-in"), {
       method: "POST",
@@ -135,12 +160,22 @@ export default function EmployeeDashboard() {
     const data = await res.json();
     alert(data.msg);
 
-    if (res.ok) setCheckedIn(true);
+    if (res.ok) {
+      setCheckedIn(true);
+    }
   };
 
+  // CHECK OUT
   const doCheckOut = async () => {
-    if (!selectedSiteId) return alert("Select a site first.");
-    if (!userPos) return alert("Please allow location access (GPS).");
+    if (!selectedSiteId) {
+      alert("Select a site first.");
+      return;
+    }
+
+    if (!userPos) {
+      alert("Please allow location access (GPS).");
+      return;
+    }
 
     const res = await fetch(apiUrl("/attendance/check-out"), {
       method: "POST",
@@ -156,9 +191,12 @@ export default function EmployeeDashboard() {
     const data = await res.json();
     alert(data.msg);
 
-    if (res.ok) setCheckedIn(false);
+    if (res.ok) {
+      setCheckedIn(false);
+    }
   };
 
+  // COMPLETE TASK
   const completeTask = async (taskId) => {
     if (!photos[taskId]) {
       alert("You must upload a photo before completing the task.");
@@ -177,6 +215,7 @@ export default function EmployeeDashboard() {
     loadTasks();
   };
 
+  // UNABLE TASK
   const unableTask = async (taskId) => {
     const reason = prompt("Why are you unable to complete this task?");
     if (!reason) return;
@@ -198,6 +237,7 @@ export default function EmployeeDashboard() {
     navigate("/");
   };
 
+  // group tasks by site
   const tasksBySite = {};
   tasks.forEach((task) => {
     if (!tasksBySite[task.siteId]) {
@@ -236,11 +276,18 @@ export default function EmployeeDashboard() {
               <h3 className="site-tasks-header">
                 {tasksBySite[siteId][0]?.siteName || "Site Tasks"}
               </h3>
+
               {tasksBySite[siteId].map((task) => (
                 <div key={task._id} className="task-card">
-                  <p><strong>Task:</strong> {task.description}</p>
                   <p>
-                    Status: <span className={`status-badge status-${task.status}`}>{task.status}</span>
+                    <strong>Task:</strong> {task.description}
+                  </p>
+
+                  <p>
+                    Status:{" "}
+                    <span className={`status-badge status-${task.status}`}>
+                      {task.status}
+                    </span>
                   </p>
 
                   {task.status === "assigned" && (
@@ -249,12 +296,22 @@ export default function EmployeeDashboard() {
                         type="file"
                         accept="image/*"
                         onChange={(e) =>
-                          setPhotos({ ...photos, [task._id]: e.target.files[0] })
+                          setPhotos({
+                            ...photos,
+                            [task._id]: e.target.files[0]
+                          })
                         }
                       />
+
                       <div className="task-actions">
-                        <button onClick={() => completeTask(task._id)}>Complete</button>
-                        <button className="unable-button" onClick={() => unableTask(task._id)}>
+                        <button onClick={() => completeTask(task._id)}>
+                          Complete
+                        </button>
+
+                        <button
+                          className="unable-button"
+                          onClick={() => unableTask(task._id)}
+                        >
                           Unable
                         </button>
                       </div>
@@ -262,7 +319,9 @@ export default function EmployeeDashboard() {
                   )}
 
                   {task.status === "unable" && (
-                    <p><strong>Reason sent:</strong> {task.employeeMessage}</p>
+                    <p>
+                      <strong>Reason sent:</strong> {task.employeeMessage}
+                    </p>
                   )}
                 </div>
               ))}
@@ -308,17 +367,22 @@ export default function EmployeeDashboard() {
               </div>
 
               <p style={{ marginTop: 10 }}>
-                Distance to site: <strong>{distance == null ? "..." : `${Math.round(distance)}m`}</strong>
-                {" "} | Allowed radius: <strong>{Number(selectedSite.radiusMeters ?? 100)}m</strong>
+                Distance to site:{" "}
+                <strong>
+                  {distance == null ? "..." : `${Math.round(distance)}m`}
+                </strong>{" "}
+                | Allowed radius:{" "}
+                <strong>{Number(selectedSite.radiusMeters ?? 100)}m</strong>
               </p>
 
               <div className="task-actions">
                 <button disabled={!isWithin || checkedIn} onClick={doCheckIn}>
                   Check In
                 </button>
+
                 <button
                   className="unable-button"
-                  disabled={!isWithin || !checkedIn}
+                  disabled={!isWithin}
                   onClick={doCheckOut}
                 >
                   Check Out
@@ -336,6 +400,7 @@ export default function EmployeeDashboard() {
 
         <div className="create-site-form">
           <h2>Join a New Site</h2>
+
           <div className="form-row">
             <input
               placeholder="Search site"
@@ -351,12 +416,16 @@ export default function EmployeeDashboard() {
             <div key={site._id} className="search-result-item">
               <strong>{site.name}</strong>
               <p>Location: {site.location}</p>
+
               <div className="join-input-group">
                 <input
                   placeholder="Join Key"
                   value={joinKeys[site._id] || ""}
                   onChange={(e) =>
-                    setJoinKeys({ ...joinKeys, [site._id]: e.target.value })
+                    setJoinKeys({
+                      ...joinKeys,
+                      [site._id]: e.target.value
+                    })
                   }
                 />
                 <button onClick={() => joinSite(site._id)}>Join</button>
