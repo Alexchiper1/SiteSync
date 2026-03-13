@@ -21,15 +21,11 @@ export default function SiteLiveMap({ site, userPos, height = 320, zoom = 15 }) 
     >
       <MapContainer center={siteCenter} zoom={zoom} style={{ width: "100%", height: "100%" }}>
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
+          attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-
-        {/* site marker + allowed radius */}
         <Marker position={siteCenter} />
         <Circle center={siteCenter} radius={radius} />
-
-        {/* employee marker */}
         {userCenter && <Marker position={userCenter} />}
       </MapContainer>
     </div>
