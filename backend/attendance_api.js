@@ -5,7 +5,17 @@ const router = express.Router();
 
 const uri = process.env.MONGO_URI;
 if (!uri) throw new Error("MONGO_URI missing. Check backend/.env");
+
+// create Mongo client
 const client = new MongoClient(uri);
+
+// helper to reuse DB connection
+async function getDb() {
+  if (!client.topology || !client.topology.isConnected()) {
+    await client.connect();
+  }
+  return client.db("app");
+}
 
 // --- helpers ---
 function haversineMeters(lat1, lon1, lat2, lon2) {
@@ -41,8 +51,7 @@ router.post("/attendance/check-in", async (req, res) => {
       return res.status(400).json({ msg: "Missing fields" });
     }
 
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     const site = await db.collection("sites").findOne({ _id: new ObjectId(siteId) });
     if (!site) return res.status(404).json({ msg: "Site not found" });
@@ -94,8 +103,7 @@ router.post("/attendance/check-out", async (req, res) => {
       return res.status(400).json({ msg: "Missing fields" });
     }
 
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     const site = await db.collection("sites").findOne({ _id: new ObjectId(siteId) });
     if (!site) return res.status(404).json({ msg: "Site not found" });
@@ -135,8 +143,7 @@ router.post("/attendance/check-out", async (req, res) => {
 // GET /attendance/manager/:managerEmail?date=YYYY-MM-DD
 router.get("/attendance/manager/:managerEmail", async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db("app");
+    const db = await getDb();
 
     const managerEmail = normalizeEmail(req.params.managerEmail);
 
