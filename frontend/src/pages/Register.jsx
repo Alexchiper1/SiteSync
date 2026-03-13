@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Register.css";
+import { apiUrl } from "../lib/api";
 
 export default function Register() {
   const [role, setRole] = useState("employee");
@@ -20,19 +21,30 @@ export default function Register() {
     };
 
 
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newUser)
-    });
+    try {
+      const response = await fetch(apiUrl("/users"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser)
+      });
 
-    const data = await response.json();
-    
-    if (response.ok) {
-      alert("Account created successfully! You can now login.");
-      navigate("/");
-    } else {
-      alert(data.msg);
+      const raw = await response.text();
+      let data = {};
+
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = { msg: raw };
+      }
+
+      if (response.ok) {
+        alert("Account created successfully! You can now login.");
+        navigate("/");
+      } else {
+        alert(data.msg || `Unable to create account. Status ${response.status}`);
+      }
+    } catch (error) {
+      alert(`Create account failed: ${error.message}`);
     }
   };
 

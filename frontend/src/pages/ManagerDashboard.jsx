@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
+import { apiUrl, taskImageUrl } from "../lib/api";
 
 export default function ManagerDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -19,29 +19,24 @@ export default function ManagerDashboard() {
   const [taskInputs, setTaskInputs] = useState({});
   const [taskLogs, setTaskLogs] = useState({});
   const [expandedSite, setExpandedSite] = useState(null);
-
-  // --- attendance ---
   const [attendance, setAttendance] = useState([]);
 
-  const loadSites = async () => {
-    const res = await fetch(`http://localhost:5000/sites/${user.email}`);
+  const loadSites = useCallback(async () => {
+    const res = await fetch(apiUrl(`/sites/${user.email}`));
     setSites(await res.json());
-  };
+  }, [user.email]);
 
-  const loadAttendance = async () => {
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
-    const res = await fetch(
-      `http://localhost:5000/attendance/manager/${user.email}?date=${today}`
-    );
+  const loadAttendance = useCallback(async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const res = await fetch(apiUrl(`/attendance/manager/${user.email}?date=${today}`));
     setAttendance(await res.json());
-  };
+  }, [user.email]);
 
   useEffect(() => {
     loadSites();
     loadAttendance();
-  }, []);
+  }, [loadSites, loadAttendance]);
 
-  // CREATE SITE
   const createSite = async (e) => {
     e.preventDefault();
 
@@ -54,12 +49,13 @@ export default function ManagerDashboard() {
       lng: site.coords?.lng,
       managerEmail: user.email
     };
+
     if (!payload.lat || !payload.lng) {
       alert("Please click the map to pick the site location.");
       return;
     }
 
-    const res = await fetch("http://localhost:5000/sites", {
+    const res = await fetch(apiUrl("/sites"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -83,7 +79,7 @@ export default function ManagerDashboard() {
     const confirmDelete = window.confirm("Delete this site?");
     if (!confirmDelete) return;
 
-    const res = await fetch(`http://localhost:5000/sites/${siteId}`, {
+    const res = await fetch(apiUrl(`/sites/${siteId}`), {
       method: "DELETE"
     });
 
@@ -93,12 +89,11 @@ export default function ManagerDashboard() {
     loadSites();
   };
 
-  // assign tasks
   const createTask = async (site) => {
     const input = taskInputs[site._id];
     if (!input?.email || !input?.desc) return alert("Fill all fields");
 
-    await fetch("http://localhost:5000/tasks", {
+    await fetch(apiUrl("/tasks"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -113,14 +108,13 @@ export default function ManagerDashboard() {
     setTaskInputs({ ...taskInputs, [site._id]: { email: "", desc: "" } });
   };
 
-  //loads the task log
   const loadTaskLog = async (siteId) => {
     if (expandedSite === siteId) {
       setExpandedSite(null);
       return;
     }
 
-    const res = await fetch(`http://localhost:5000/tasks-site/${siteId}`);
+    const res = await fetch(apiUrl(`/tasks-site/${siteId}`));
     setTaskLogs({ ...taskLogs, [siteId]: await res.json() });
     setExpandedSite(siteId);
   };
@@ -131,222 +125,194 @@ export default function ManagerDashboard() {
   };
 
   return (
-    <>
-      <div className="manager-dashboard">
-        {/* Left Sidebar - Profile Card */}
-        <div className="profile-sidebar">
-          <div className="profile-card">
-            <div className="profile-avatar">
-              <img src="https://via.placeholder.com/80" alt="Profile" />
-            </div>
-            <h3 className="profile-name">{user?.name || "Manager"}</h3>
-            <p className="profile-role">Manager</p>
-            <p className="profile-details">{user?.email}</p>
-            <p className="profile-company">
-              <strong>Company:</strong> {user?.companyName}
-            </p>
-            <button className="logout-button" onClick={handleLogout}>
-              Logout
+    <div className="manager-dashboard">
+      <div className="profile-sidebar">
+        <div className="profile-card">
+          <div className="profile-avatar">
+            <img src="https://via.placeholder.com/80" alt="Profile" />
+          </div>
+          <h3 className="profile-name">{user?.name || "Manager"}</h3>
+          <p className="profile-role">Manager</p>
+          <p className="profile-details">{user?.email}</p>
+          <p className="profile-company"><strong>Company:</strong> {user?.companyName}</p>
+          <button className="logout-button" onClick={handleLogout}>Logout</button>
+        </div>
+      </div>
+
+      <div className="main-content">
+        <div className="dashboard-header">
+          <h1>Manager Dashboard</h1>
+        </div>
+
+        <div className="create-site-form" style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 style={{ margin: 0 }}>Today's Check-Ins</h2>
+            <button onClick={loadAttendance} style={{ height: 36 }}>
+              Refresh
             </button>
+          </div>
+
+          <div className="attendance-table">
+            <div className="attendance-header">
+              <span><strong>Employee</strong></span>
+              <span><strong>Site</strong></span>
+              <span><strong>Check In</strong></span>
+              <span><strong>Check Out</strong></span>
+            </div>
+
+            {attendance.length === 0 ? (
+              <div className="attendance-row">
+                <span>No check-ins yet today.</span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            ) : (
+              attendance.map((row) => (
+                <div key={row._id} className="attendance-row">
+                  <span>{row.employeeName}</span>
+                  <span>{row.siteName}</span>
+                  <span>
+                    {new Date(row.checkInAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </span>
+                  <span>
+                    {row.checkOutAt
+                      ? new Date(row.checkOutAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })
+                      : "—"}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="main-content">
-          <div className="dashboard-header">
-            <h1>Manager Dashboard</h1>
-          </div>
-
-          {/* TODAY'S CHECK-INS */}
-          <div className="create-site-form" style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 style={{ margin: 0 }}>Today's Check-Ins</h2>
-              <button onClick={loadAttendance} style={{ height: 36 }}>
-                Refresh
+        <div className="create-site-form">
+          <h2>Create Site</h2>
+          <form onSubmit={createSite} className="create-site-grid">
+            <div className="create-site-left">
+              <input
+                placeholder="Site name"
+                value={site.name}
+                onChange={(e) => setSite({ ...site, name: e.target.value })}
+              />
+              <input
+                placeholder="Address / Location name"
+                value={site.location}
+                onChange={(e) => setSite({ ...site, location: e.target.value })}
+              />
+              <input
+                placeholder="Radius meters (e.g. 150)"
+                value={site.radiusMeters}
+                onChange={(e) => setSite({ ...site, radiusMeters: e.target.value })}
+              />
+              <div className="coords-pill">
+                {site.coords ? (
+                  <>
+                    <span>Selected:</span>
+                    <strong>
+                      {site.coords.lat.toFixed(6)}, {site.coords.lng.toFixed(6)}
+                    </strong>
+                  </>
+                ) : (
+                  <span>Click the map to set the exact site location</span>
+                )}
+              </div>
+              <input
+                placeholder="Join Key"
+                value={site.joinKey}
+                onChange={(e) => setSite({ ...site, joinKey: e.target.value })}
+              />
+              <button className="create-site-btn" type="submit">
+                Create Site
               </button>
             </div>
 
-            <div className="attendance-table">
-              <div className="attendance-header">
-                <span><strong>Employee</strong></span>
-                <span><strong>Site</strong></span>
-                <span><strong>Check In</strong></span>
-                <span><strong>Check Out</strong></span>
+            <div className="create-site-right">
+              <MapPicker
+                value={site.coords}
+                onChange={(coords) => setSite({ ...site, coords })}
+                height={260}
+                defaultZoom={14}
+              />
+            </div>
+          </form>
+        </div>
+
+        <h2>My Sites</h2>
+
+        {sites.map((site) => (
+          <div key={site._id} className="site-card">
+            <strong>{site.name}</strong>
+            <p>{site.location}</p>
+
+            <button
+              className="delete-site-btn"
+              onClick={() => deleteSite(site._id)}
+            >
+              Delete Site
+            </button>
+
+            <div className="task-section">
+              <h4>Assign Task</h4>
+              <div className="task-inputs">
+                <input
+                  placeholder="Employee email"
+                  value={taskInputs[site._id]?.email || ""}
+                  onChange={(e) =>
+                    setTaskInputs({
+                      ...taskInputs,
+                      [site._id]: { ...taskInputs[site._id], email: e.target.value }
+                    })
+                  }
+                />
+                <input
+                  placeholder="Task description"
+                  value={taskInputs[site._id]?.desc || ""}
+                  onChange={(e) =>
+                    setTaskInputs({
+                      ...taskInputs,
+                      [site._id]: { ...taskInputs[site._id], desc: e.target.value }
+                    })
+                  }
+                />
+                <button onClick={() => createTask(site)}>Add Task</button>
               </div>
 
-              {attendance.length === 0 ? (
-                <div className="attendance-row">
-                  <span>No check-ins yet today.</span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
+              <button onClick={() => loadTaskLog(site._id)}>
+                {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
+              </button>
+
+              {expandedSite === site._id && taskLogs[site._id] && (
+                <div className="task-log">
+                  {taskLogs[site._id].map((task) => (
+                    <div key={task._id} className="task-item">
+                      <strong>{task.employeeEmail}</strong>
+                      <span className={`status-badge status-${task.status}`}>{task.status}</span>
+                      <p>{task.description}</p>
+
+                      {task.image && (
+                        <div>
+                          <img src={taskImageUrl(task.image)} alt="proof" />
+                        </div>
+                      )}
+
+                      {task.employeeMessage && (
+                        <p><strong>Message:</strong> {task.employeeMessage}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                attendance.map((row) => (
-                  <div key={row._id} className="attendance-row">
-                    <span>{row.employeeName}</span>
-                    <span>{row.siteName}</span>
-                    <span>
-                      {new Date(row.checkInAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      })}
-                    </span>
-                    <span>
-                      {row.checkOutAt
-                        ? new Date(row.checkOutAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          })
-                        : "—"}
-                    </span>
-                  </div>
-                ))
               )}
             </div>
           </div>
-
-          {/* CREATE SITE */}
-          <div className="create-site-form">
-            <h2>Create Site</h2>
-            <form onSubmit={createSite} className="create-site-grid">
-              {/* LEFT: inputs */}
-              <div className="create-site-left">
-                <input
-                  placeholder="Site name"
-                  value={site.name}
-                  onChange={(e) => setSite({ ...site, name: e.target.value })}
-                />
-                <input
-                  placeholder="Address / Location name"
-                  value={site.location}
-                  onChange={(e) =>
-                    setSite({ ...site, location: e.target.value })
-                  }
-                />
-                <input
-                  placeholder="Radius meters (e.g. 150)"
-                  value={site.radiusMeters}
-                  onChange={(e) =>
-                    setSite({ ...site, radiusMeters: e.target.value })
-                  }
-                />
-                <div className="coords-pill">
-                  {site.coords ? (
-                    <>
-                      <span>Selected:</span>
-                      <strong>
-                        {site.coords.lat.toFixed(6)}, {site.coords.lng.toFixed(6)}
-                      </strong>
-                    </>
-                  ) : (
-                    <span>Click the map to set the exact site location</span>
-                  )}
-                </div>
-                <input
-                  placeholder="Join Key"
-                  value={site.joinKey}
-                  onChange={(e) => setSite({ ...site, joinKey: e.target.value })}
-                />
-                <button className="create-site-btn" type="submit">
-                  Create Site
-                </button>
-              </div>
-              {/* RIGHT: map */}
-              <div className="create-site-right">
-                <MapPicker
-                  value={site.coords}
-                  onChange={(coords) => setSite({ ...site, coords })}
-                  height={260}
-                  defaultZoom={14}
-                />
-              </div>
-            </form>
-          </div>
-
-          <h2>My Sites</h2>
-
-          {sites.map((site) => (
-            <div key={site._id} className="site-card">
-              <strong>{site.name}</strong>
-              <p>{site.location}</p>
-
-              <button
-                className="delete-site-btn"
-                onClick={() => deleteSite(site._id)}
-              >
-                Delete Site
-              </button>
-
-              <div className="task-section">
-                <h4>Assign Task</h4>
-                <div className="task-inputs">
-                  <input
-                    placeholder="Employee email"
-                    value={taskInputs[site._id]?.email || ""}
-                    onChange={(e) =>
-                      setTaskInputs({
-                        ...taskInputs,
-                        [site._id]: {
-                          ...taskInputs[site._id],
-                          email: e.target.value
-                        }
-                      })
-                    }
-                  />
-                  <input
-                    placeholder="Task description"
-                    value={taskInputs[site._id]?.desc || ""}
-                    onChange={(e) =>
-                      setTaskInputs({
-                        ...taskInputs,
-                        [site._id]: {
-                          ...taskInputs[site._id],
-                          desc: e.target.value
-                        }
-                      })
-                    }
-                  />
-                  <button onClick={() => createTask(site)}>Add Task</button>
-                </div>
-
-                <button onClick={() => loadTaskLog(site._id)}>
-                  {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
-                </button>
-
-                {expandedSite === site._id && taskLogs[site._id] && (
-                  <div className="task-log">
-                    {taskLogs[site._id].map((task) => (
-                      <div key={task._id} className="task-item">
-                        <strong>{task.employeeEmail}</strong>
-                        <span className={`status-badge status-${task.status}`}>
-                          {task.status}
-                        </span>
-                        <p>{task.description}</p>
-
-                        {task.image && (
-                          <div>
-                            <img
-                              src={`http://localhost:5000/uploads/${task.image}`}
-                              alt="proof"
-                            />
-                          </div>
-                        )}
-
-                        {task.employeeMessage && (
-                          <p>
-                            <strong>Message:</strong> {task.employeeMessage}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 }
