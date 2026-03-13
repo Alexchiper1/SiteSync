@@ -134,8 +134,12 @@ export default function ManagerDashboard() {
           <h3 className="profile-name">{user?.name || "Manager"}</h3>
           <p className="profile-role">Manager</p>
           <p className="profile-details">{user?.email}</p>
-          <p className="profile-company"><strong>Company:</strong> {user?.companyName}</p>
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
+          <p className="profile-company">
+            <strong>Company:</strong> {user?.companyName}
+          </p>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
 
@@ -192,6 +196,89 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
+        <h2>My Sites</h2>
+
+        {sites.length === 0 ? (
+          <p>No sites created yet.</p>
+        ) : (
+          sites.map((site) => (
+            <div key={site._id} className="site-card">
+              <strong>{site.name}</strong>
+              <p>{site.location}</p>
+
+              <button
+                className="delete-site-btn"
+                onClick={() => deleteSite(site._id)}
+              >
+                Delete Site
+              </button>
+
+              <div className="task-section">
+                <h4>Assign Task</h4>
+                <div className="task-inputs">
+                  <input
+                    placeholder="Employee email"
+                    value={taskInputs[site._id]?.email || ""}
+                    onChange={(e) =>
+                      setTaskInputs({
+                        ...taskInputs,
+                        [site._id]: {
+                          ...taskInputs[site._id],
+                          email: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <input
+                    placeholder="Task description"
+                    value={taskInputs[site._id]?.desc || ""}
+                    onChange={(e) =>
+                      setTaskInputs({
+                        ...taskInputs,
+                        [site._id]: {
+                          ...taskInputs[site._id],
+                          desc: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <button onClick={() => createTask(site)}>Add Task</button>
+                </div>
+
+                <button onClick={() => loadTaskLog(site._id)}>
+                  {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
+                </button>
+
+                {expandedSite === site._id && taskLogs[site._id] && (
+                  <div className="task-log">
+                    {taskLogs[site._id].map((task) => (
+                      <div key={task._id} className="task-item">
+                        <strong>{task.employeeEmail}</strong>
+                        <span className={`status-badge status-${task.status}`}>
+                          {task.status}
+                        </span>
+                        <p>{task.description}</p>
+
+                        {task.image && (
+                          <div>
+                            <img src={taskImageUrl(task.image)} alt="proof" />
+                          </div>
+                        )}
+
+                        {task.employeeMessage && (
+                          <p>
+                            <strong>Message:</strong> {task.employeeMessage}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+
         <div className="create-site-form">
           <h2>Create Site</h2>
           <form onSubmit={createSite} className="create-site-grid">
@@ -243,75 +330,6 @@ export default function ManagerDashboard() {
             </div>
           </form>
         </div>
-
-        <h2>My Sites</h2>
-
-        {sites.map((site) => (
-          <div key={site._id} className="site-card">
-            <strong>{site.name}</strong>
-            <p>{site.location}</p>
-
-            <button
-              className="delete-site-btn"
-              onClick={() => deleteSite(site._id)}
-            >
-              Delete Site
-            </button>
-
-            <div className="task-section">
-              <h4>Assign Task</h4>
-              <div className="task-inputs">
-                <input
-                  placeholder="Employee email"
-                  value={taskInputs[site._id]?.email || ""}
-                  onChange={(e) =>
-                    setTaskInputs({
-                      ...taskInputs,
-                      [site._id]: { ...taskInputs[site._id], email: e.target.value }
-                    })
-                  }
-                />
-                <input
-                  placeholder="Task description"
-                  value={taskInputs[site._id]?.desc || ""}
-                  onChange={(e) =>
-                    setTaskInputs({
-                      ...taskInputs,
-                      [site._id]: { ...taskInputs[site._id], desc: e.target.value }
-                    })
-                  }
-                />
-                <button onClick={() => createTask(site)}>Add Task</button>
-              </div>
-
-              <button onClick={() => loadTaskLog(site._id)}>
-                {expandedSite === site._id ? "Hide Task Log" : "View Task Log"}
-              </button>
-
-              {expandedSite === site._id && taskLogs[site._id] && (
-                <div className="task-log">
-                  {taskLogs[site._id].map((task) => (
-                    <div key={task._id} className="task-item">
-                      <strong>{task.employeeEmail}</strong>
-                      <span className={`status-badge status-${task.status}`}>{task.status}</span>
-                      <p>{task.description}</p>
-
-                      {task.image && (
-                        <div>
-                          <img src={taskImageUrl(task.image)} alt="proof" />
-                        </div>
-                      )}
-
-                      {task.employeeMessage && (
-                        <p><strong>Message:</strong> {task.employeeMessage}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
