@@ -1,6 +1,5 @@
-// Distance between two lat/lng points in meters (Haversine)
 export function haversineMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000; // meters
+  const R = 6371000;
   const toRad = (v) => (v * Math.PI) / 180;
 
   const dLat = toRad(lat2 - lat1);
