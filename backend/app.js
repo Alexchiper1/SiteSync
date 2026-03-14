@@ -9,18 +9,15 @@ import attendanceAPI from "./attendance_api.js";
 
 const app = express();
 const api = express.Router();
-const allowedOrigins = new Set(
-  [
-    "http://localhost:3000",
-    process.env.FRONTEND_URL,
-    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`
-  ].filter(Boolean)
-);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.has(origin)) {
+      const isLocalhost = origin?.startsWith("http://localhost:");
+      const isVercelDeployment = origin?.endsWith(".vercel.app");
+      const isConfiguredFrontend = origin === process.env.FRONTEND_URL;
+
+      if (!origin || isLocalhost || isVercelDeployment || isConfiguredFrontend) {
         return callback(null, true);
       }
 
