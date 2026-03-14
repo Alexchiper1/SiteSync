@@ -1,0 +1,57 @@
+name: Sync main into other branches
+
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: |
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+
+      - name: Merge main into every other branch
+        shell: bash
+        run: |
+          set -e
+
+          BRANCHES=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ \
+            | sed 's|^origin/||' \
+            | grep -v '^HEAD$' \
+            | grep -v '^main$')
+
+          echo "Branches to sync:"
+          echo "$BRANCHES"
+
+          for branch in $BRANCHES; do
+            echo "-----------------------------"
+            echo "Syncing main into $branch"
+
+            git checkout -B "$branch" "origin/$branch"
+
+            if git merge --no-edit origin/main; then
+              git push origin "$branch"
+              echo "Synced main into $branch"
+            else
+              echo "Merge conflict on $branch, aborting merge and skipping"
+              git merge --abort || true
+            fi
+          done
