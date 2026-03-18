@@ -390,6 +390,62 @@ export default function EmployeeDashboard() {
           )}
         </div>
 
+        <div className="create-site-form" style={{ marginTop: 20 }}>
+          <h2>Check In / Check Out</h2>
+
+          <div className="form-row">
+            <select
+              value={selectedSiteId}
+              onChange={(e) => setSelectedSiteId(e.target.value)}
+              style={{ flex: 1 }}
+            >
+              <option value="">Select a site</option>
+              {mySites.map((s) => (
+                <option key={s._id} value={s.siteId}>
+                  {s.siteName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedSite && (
+            <>
+              <div style={{ marginTop: 12 }}>
+                <SiteLiveMap site={selectedSite} userPos={userPos} size={320} />
+              </div>
+
+              <p style={{ marginTop: 10 }}>
+                Distance to site:{" "}
+                <strong>
+                  {distance == null ? "..." : `${Math.round(distance)}m`}
+                </strong>{" "}
+                | Allowed radius:{" "}
+                <strong>{Number(selectedSite.radiusMeters ?? 100)}m</strong>
+              </p>
+
+              <div className="task-actions">
+                <button disabled={!isWithin || checkedIn} onClick={doCheckIn}>
+                  Check In
+                </button>
+
+                <button
+                  className="unable-button"
+                  disabled={!isWithin}
+                  onClick={doCheckOut}
+                >
+                  Check Out
+                </button>
+              </div>
+
+              {!isWithin && (
+                <p style={{ color: "tomato" }}>
+                  You must be inside the radius to check in/out.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+
         <div className="create-site-form">
           <h2>Request Holiday</h2>
 
@@ -469,62 +525,6 @@ export default function EmployeeDashboard() {
             ))}
           </div>
         )}
-
-        <div className="create-site-form" style={{ marginTop: 20 }}>
-          <h2>Check In / Check Out</h2>
-
-          <div className="form-row">
-            <select
-              value={selectedSiteId}
-              onChange={(e) => setSelectedSiteId(e.target.value)}
-              style={{ flex: 1 }}
-            >
-              <option value="">Select a site</option>
-              {mySites.map((s) => (
-                <option key={s._id} value={s.siteId}>
-                  {s.siteName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {selectedSite && (
-            <>
-              <div style={{ marginTop: 12 }}>
-                <SiteLiveMap site={selectedSite} userPos={userPos} size={320} />
-              </div>
-
-              <p style={{ marginTop: 10 }}>
-                Distance to site:{" "}
-                <strong>
-                  {distance == null ? "..." : `${Math.round(distance)}m`}
-                </strong>{" "}
-                | Allowed radius:{" "}
-                <strong>{Number(selectedSite.radiusMeters ?? 100)}m</strong>
-              </p>
-
-              <div className="task-actions">
-                <button disabled={!isWithin || checkedIn} onClick={doCheckIn}>
-                  Check In
-                </button>
-
-                <button
-                  className="unable-button"
-                  disabled={!isWithin}
-                  onClick={doCheckOut}
-                >
-                  Check Out
-                </button>
-              </div>
-
-              {!isWithin && (
-                <p style={{ color: "tomato" }}>
-                  You must be inside the radius to check in/out.
-                </p>
-              )}
-            </>
-          )}
-        </div>
 
         <div className="create-site-form">
           <h2>Join a New Site</h2>
