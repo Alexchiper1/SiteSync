@@ -241,6 +241,10 @@
   font-weight: 600;
 }
 
+.task-item input {
+  margin-top: 12px;
+}
+
 .task-item img {
   max-width: 300px;
   margin-top: 12px;
@@ -285,4 +289,24 @@
 
 .attendance-row:last-child {
   border-bottom: none;
+}
+
+.task-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.task-actions-row button {
+  width: auto;
+  flex: 1;
+  margin-top: 0;
+}
+
+.delete-site-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.delete-site-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 }

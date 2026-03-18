@@ -6,6 +6,7 @@ import usersAPI from "./users_api.js";
 import sitesAPI from "./sites_api.js";
 import tasksAPI from "./tasks_api.js";
 import attendanceAPI from "./attendance_api.js";
+import holidayRequestsAPI from "./holidayRequests_api.js";
 
 const app = express();
 const api = express.Router();
@@ -32,6 +33,7 @@ api.use(usersAPI);
 api.use(sitesAPI);
 api.use(tasksAPI);
 api.use(attendanceAPI);
+api.use(holidayRequestsAPI);
 
 app.use(api);
 app.use("/api", api);

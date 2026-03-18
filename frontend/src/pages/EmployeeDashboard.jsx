@@ -15,6 +15,13 @@ export default function EmployeeDashboard() {
   const [mySites, setMySites] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [photos, setPhotos] = useState({});
+  const [holidayRequests, setHolidayRequests] = useState([]);
+  const [holidayForm, setHolidayForm] = useState({
+    siteId: "",
+    startDate: "",
+    endDate: "",
+    reason: ""
+  });
 
   // attendance states
   const [selectedSiteId, setSelectedSiteId] = useState("");
@@ -38,10 +45,18 @@ export default function EmployeeDashboard() {
     setTasks(await res.json());
   }, [user.email]);
 
+  const loadHolidayRequests = useCallback(async () => {
+    const res = await fetch(
+      apiUrl(`/holiday-requests/employee/${user.email.trim().toLowerCase()}`)
+    );
+    setHolidayRequests(await res.json());
+  }, [user.email]);
+
   useEffect(() => {
     loadMySites();
     loadTasks();
-  }, [loadMySites, loadTasks]);
+    loadHolidayRequests();
+  }, [loadMySites, loadTasks, loadHolidayRequests]);
 
   // GPS live location
   useEffect(() => {
@@ -232,6 +247,39 @@ export default function EmployeeDashboard() {
     loadTasks();
   };
 
+  const submitHolidayRequest = async () => {
+    if (!holidayForm.siteId || !holidayForm.startDate || !holidayForm.endDate) {
+      alert("Please fill all holiday dates and select a site.");
+      return;
+    }
+
+    const res = await fetch(apiUrl("/holiday-requests"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        siteId: holidayForm.siteId,
+        employeeEmail: user.email,
+        employeeName: user.name,
+        startDate: holidayForm.startDate,
+        endDate: holidayForm.endDate,
+        reason: holidayForm.reason
+      })
+    });
+
+    const data = await res.json();
+    alert(data.msg);
+
+    if (res.ok) {
+      setHolidayForm({
+        siteId: "",
+        startDate: "",
+        endDate: "",
+        reason: ""
+      });
+      loadHolidayRequests();
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -341,6 +389,86 @@ export default function EmployeeDashboard() {
             ))
           )}
         </div>
+
+        <div className="create-site-form">
+          <h2>Request Holiday</h2>
+
+          <select
+            value={holidayForm.siteId}
+            onChange={(e) =>
+              setHolidayForm({ ...holidayForm, siteId: e.target.value })
+            }
+          >
+            <option value="">Select a site</option>
+            {mySites.map((site) => (
+              <option key={site._id} value={site.siteId}>
+                {site.siteName}
+              </option>
+            ))}
+          </select>
+
+          <div className="form-row">
+            <input
+              type="date"
+              value={holidayForm.startDate}
+              onChange={(e) =>
+                setHolidayForm({ ...holidayForm, startDate: e.target.value })
+              }
+            />
+            <input
+              type="date"
+              value={holidayForm.endDate}
+              onChange={(e) =>
+                setHolidayForm({ ...holidayForm, endDate: e.target.value })
+              }
+            />
+          </div>
+
+          <input
+            type="text"
+            placeholder="Reason (optional)"
+            value={holidayForm.reason}
+            onChange={(e) =>
+              setHolidayForm({ ...holidayForm, reason: e.target.value })
+            }
+          />
+
+          <button onClick={submitHolidayRequest}>Send Holiday Request</button>
+        </div>
+
+        <h2>My Holiday Requests</h2>
+        {holidayRequests.length === 0 ? (
+          <p>No holiday requests yet.</p>
+        ) : (
+          <div className="holiday-request-list">
+            {holidayRequests.map((request) => (
+              <div key={request._id} className="task-card holiday-request-card">
+                <p>
+                  <strong>Site:</strong> {request.siteName}
+                </p>
+                <p>
+                  <strong>Dates:</strong> {request.startDate} to {request.endDate}
+                </p>
+                <p>
+                  <strong>Status:</strong>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+                </p>
+                {request.reason && (
+                  <p>
+                    <strong>Reason:</strong> {request.reason}
+                  </p>
+                )}
+                {request.managerNote && (
+                  <p>
+                    <strong>Manager note:</strong> {request.managerNote}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="create-site-form" style={{ marginTop: 20 }}>
           <h2>Check In / Check Out</h2>

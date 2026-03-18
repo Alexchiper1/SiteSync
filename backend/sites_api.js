@@ -115,6 +115,10 @@ router.delete("/sites/:siteId", async (req, res) => {
       siteId: req.params.siteId
     });
 
+    await db.collection("holidayRequests").deleteMany({
+      siteId: req.params.siteId
+    });
+
     res.json({ msg: "Site deleted" });
   } catch (err) {
     console.error(err);

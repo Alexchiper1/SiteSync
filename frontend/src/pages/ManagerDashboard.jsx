@@ -20,6 +20,8 @@ export default function ManagerDashboard() {
   const [taskLogs, setTaskLogs] = useState({});
   const [expandedSite, setExpandedSite] = useState(null);
   const [attendance, setAttendance] = useState([]);
+  const [holidayRequests, setHolidayRequests] = useState([]);
+  const [requestNotes, setRequestNotes] = useState({});
 
   const loadSites = useCallback(async () => {
     const res = await fetch(apiUrl(`/sites/${user.email}`));
@@ -32,10 +34,16 @@ export default function ManagerDashboard() {
     setAttendance(await res.json());
   }, [user.email]);
 
+  const loadHolidayRequests = useCallback(async () => {
+    const res = await fetch(apiUrl(`/holiday-requests/manager/${user.email}`));
+    setHolidayRequests(await res.json());
+  }, [user.email]);
+
   useEffect(() => {
     loadSites();
     loadAttendance();
-  }, [loadSites, loadAttendance]);
+    loadHolidayRequests();
+  }, [loadSites, loadAttendance, loadHolidayRequests]);
 
   const createSite = async (e) => {
     e.preventDefault();
@@ -119,6 +127,26 @@ export default function ManagerDashboard() {
     setExpandedSite(siteId);
   };
 
+  const updateHolidayRequest = async (requestId, status) => {
+    const res = await fetch(apiUrl(`/holiday-requests/${requestId}`), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status,
+        managerEmail: user.email,
+        managerNote: requestNotes[requestId] || ""
+      })
+    });
+
+    const data = await res.json();
+    alert(data.msg);
+
+    if (res.ok) {
+      loadHolidayRequests();
+      setRequestNotes({ ...requestNotes, [requestId]: "" });
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -194,6 +222,80 @@ export default function ManagerDashboard() {
               ))
             )}
           </div>
+        </div>
+
+        <div className="create-site-form" style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 style={{ margin: 0 }}>Holiday Requests</h2>
+            <button onClick={loadHolidayRequests} style={{ height: 36 }}>
+              Refresh
+            </button>
+          </div>
+
+          {holidayRequests.length === 0 ? (
+            <p>No holiday requests yet.</p>
+          ) : (
+            <div className="task-log">
+              {holidayRequests.map((request) => (
+                <div key={request._id} className="task-item">
+                  <strong>{request.employeeName || request.employeeEmail}</strong>
+                  <span className={`status-badge status-${request.status}`}>
+                    {request.status}
+                  </span>
+
+                  <p>
+                    <strong>Email:</strong> {request.employeeEmail}
+                  </p>
+                  <p>
+                    <strong>Site:</strong> {request.siteName}
+                  </p>
+                  <p>
+                    <strong>Dates:</strong> {request.startDate} to {request.endDate}
+                  </p>
+
+                  {request.reason && (
+                    <p>
+                      <strong>Reason:</strong> {request.reason}
+                    </p>
+                  )}
+
+                  {request.managerNote && (
+                    <p>
+                      <strong>Manager note:</strong> {request.managerNote}
+                    </p>
+                  )}
+
+                  {request.status === "pending" && (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Optional note"
+                        value={requestNotes[request._id] || ""}
+                        onChange={(e) =>
+                          setRequestNotes({
+                            ...requestNotes,
+                            [request._id]: e.target.value
+                          })
+                        }
+                      />
+
+                      <div className="task-actions-row">
+                        <button onClick={() => updateHolidayRequest(request._id, "approved")}>
+                          Approve
+                        </button>
+                        <button
+                          className="delete-site-btn"
+                          onClick={() => updateHolidayRequest(request._id, "denied")}
+                        >
+                          Deny
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <h2>My Sites</h2>

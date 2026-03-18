@@ -315,3 +315,11 @@
   margin-bottom: 12px;
   margin-top: 16px;
 }
+
+.holiday-request-list {
+  margin-bottom: 24px;
+}
+
+.holiday-request-card {
+  border-left-color: #3b82f6;
+}
