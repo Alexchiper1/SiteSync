@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Login.css";
 import { apiUrl } from "../lib/api";
@@ -8,6 +8,8 @@ export default function Login() {
   const [users, setUsers] = useState([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "info" });
+  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,13 +18,20 @@ export default function Login() {
       .then(data => setUsers(data));
   }, []);
 
+  useEffect(() => {
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
+
   const handleLogin = () => {
     const user = users.find(
       u => u.email === email && u.password === password
     );
 
     if (!user) {
-      alert("Invalid email or password");
+      setMessage({ text: "Invalid email or password", type: "error" });
       return;
     }
 
@@ -37,6 +46,12 @@ export default function Login() {
       <Logo />
       <div className="form-container">
       <h2>Login</h2>
+
+      {message.text && (
+        <div className={`app-message app-message-${message.type}`}>
+          {message.text}
+        </div>
+      )}
 
       <input
         type="email"

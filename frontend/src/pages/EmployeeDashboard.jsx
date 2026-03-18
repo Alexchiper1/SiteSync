@@ -8,6 +8,7 @@ import { haversineMeters } from "../utils/distance";
 export default function EmployeeDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+  const [message, setMessage] = useState({ text: "", type: "info" });
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -15,6 +16,7 @@ export default function EmployeeDashboard() {
   const [mySites, setMySites] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [photos, setPhotos] = useState({});
+  const [unableInputs, setUnableInputs] = useState({});
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [holidayForm, setHolidayForm] = useState({
     siteId: "",
@@ -140,7 +142,7 @@ export default function EmployeeDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "danger" : "error" });
 
     if (data.msg === "Joined site successfully") {
       loadMySites();
@@ -151,12 +153,12 @@ export default function EmployeeDashboard() {
   // CHECK IN
   const doCheckIn = async () => {
     if (!selectedSiteId) {
-      alert("Select a site first.");
+      setMessage({ text: "Select a site first.", type: "error" });
       return;
     }
 
     if (!userPos) {
-      alert("Please allow location access (GPS).");
+      setMessage({ text: "Please allow location access (GPS).", type: "error" });
       return;
     }
 
@@ -173,7 +175,7 @@ export default function EmployeeDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
     if (res.ok) {
       setCheckedIn(true);
@@ -183,12 +185,12 @@ export default function EmployeeDashboard() {
   // CHECK OUT
   const doCheckOut = async () => {
     if (!selectedSiteId) {
-      alert("Select a site first.");
+      setMessage({ text: "Select a site first.", type: "error" });
       return;
     }
 
     if (!userPos) {
-      alert("Please allow location access (GPS).");
+      setMessage({ text: "Please allow location access (GPS).", type: "error" });
       return;
     }
 
@@ -204,7 +206,7 @@ export default function EmployeeDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
     if (res.ok) {
       setCheckedIn(false);
@@ -214,28 +216,37 @@ export default function EmployeeDashboard() {
   // COMPLETE TASK
   const completeTask = async (taskId) => {
     if (!photos[taskId]) {
-      alert("You must upload a photo before completing the task.");
+      setMessage({
+        text: "You must upload a photo before completing the task.",
+        type: "error"
+      });
       return;
     }
 
     const formData = new FormData();
     formData.append("photo", photos[taskId]);
 
-    await fetch(apiUrl(`/tasks-complete/${taskId}`), {
+    const res = await fetch(apiUrl(`/tasks-complete/${taskId}`), {
       method: "PUT",
       body: formData
     });
 
-    alert("Task completed successfully");
-    loadTasks();
+    if (res.ok) {
+      setMessage({ text: "Task completed successfully", type: "success" });
+      loadTasks();
+      return;
+    }
+
+    const data = await res.json();
+    setMessage({ text: data.msg || "Error completing task", type: "error" });
   };
 
   // UNABLE TASK
   const unableTask = async (taskId) => {
-    const reason = prompt("Why are you unable to complete this task?");
+    const reason = unableInputs[taskId]?.trim();
     if (!reason) return;
 
-    await fetch(apiUrl(`/tasks/${taskId}`), {
+    const res = await fetch(apiUrl(`/tasks/${taskId}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -244,12 +255,23 @@ export default function EmployeeDashboard() {
       })
     });
 
-    loadTasks();
+    if (res.ok) {
+      setMessage({ text: "Reason sent to manager", type: "success" });
+      setUnableInputs({ ...unableInputs, [taskId]: "" });
+      loadTasks();
+      return;
+    }
+
+    const data = await res.json();
+    setMessage({ text: data.msg || "Error updating task", type: "error" });
   };
 
   const submitHolidayRequest = async () => {
     if (!holidayForm.siteId || !holidayForm.startDate || !holidayForm.endDate) {
-      alert("Please fill all holiday dates and select a site.");
+      setMessage({
+        text: "Please fill all holiday dates and select a site.",
+        type: "error"
+      });
       return;
     }
 
@@ -267,7 +289,7 @@ export default function EmployeeDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
     if (res.ok) {
       setHolidayForm({
@@ -315,6 +337,12 @@ export default function EmployeeDashboard() {
           <h1>Hello {user?.name?.split(" ")[0] || "Employee"}!</h1>
         </div>
 
+        {message.text && (
+          <div className={`app-message app-message-${message.type}`}>
+            {message.text}
+          </div>
+        )}
+
         <h2>Your Tasks</h2>
         {tasks.length === 0 ? (
           <p>No tasks assigned yet.</p>
@@ -361,6 +389,23 @@ export default function EmployeeDashboard() {
                           onClick={() => unableTask(task._id)}
                         >
                           Unable
+                        </button>
+                      </div>
+
+                      <div className="inline-action-box">
+                        <input
+                          type="text"
+                          placeholder="Why are you unable to complete this task?"
+                          value={unableInputs[task._id] || ""}
+                          onChange={(e) =>
+                            setUnableInputs({
+                              ...unableInputs,
+                              [task._id]: e.target.value
+                            })
+                          }
+                        />
+                        <button onClick={() => unableTask(task._id)}>
+                          Send Reason
                         </button>
                       </div>
                     </>

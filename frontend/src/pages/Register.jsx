@@ -7,6 +7,7 @@ import { apiUrl } from "../lib/api";
 export default function Register() {
   const [role, setRole] = useState("employee");
   const [form, setForm] = useState({});
+  const [message, setMessage] = useState({ text: "", type: "info" });
   const navigate = useNavigate();
 
   const submit = async (e) => {
@@ -38,13 +39,25 @@ export default function Register() {
       }
 
       if (response.ok) {
-        alert("Account created successfully! You can now login.");
-        navigate("/");
+        navigate("/", {
+          state: {
+            message: {
+              text: "Account created successfully! You can now login.",
+              type: "success"
+            }
+          }
+        });
       } else {
-        alert(data.msg || `Unable to create account. Status ${response.status}`);
+        setMessage({
+          text: data.msg || `Unable to create account. Status ${response.status}`,
+          type: "error"
+        });
       }
     } catch (error) {
-      alert(`Create account failed: ${error.message}`);
+      setMessage({
+        text: `Create account failed: ${error.message}`,
+        type: "error"
+      });
     }
   };
 
@@ -55,6 +68,12 @@ export default function Register() {
       <div className="form-container">
         <form onSubmit={submit}>
           <h2>Register</h2>
+
+        {message.text && (
+          <div className={`app-message app-message-${message.type}`}>
+            {message.text}
+          </div>
+        )}
 
 
         <input

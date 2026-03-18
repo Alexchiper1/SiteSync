@@ -303,10 +303,31 @@
   margin-top: 0;
 }
 
+.inline-confirm-box {
+  margin-top: 14px;
+  padding: 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.inline-confirm-box p {
+  margin: 0 0 12px;
+  text-align: left;
+}
+
 .delete-site-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
 .delete-site-btn:hover {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.cancel-action-btn {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.cancel-action-btn:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
 }

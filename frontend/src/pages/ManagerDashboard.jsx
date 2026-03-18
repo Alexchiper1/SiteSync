@@ -7,6 +7,7 @@ import { apiUrl, taskImageUrl } from "../lib/api";
 export default function ManagerDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+  const [message, setMessage] = useState({ text: "", type: "info" });
 
   const [site, setSite] = useState({
     name: "",
@@ -22,6 +23,7 @@ export default function ManagerDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [requestNotes, setRequestNotes] = useState({});
+  const [deleteSiteId, setDeleteSiteId] = useState("");
 
   const loadSites = useCallback(async () => {
     const res = await fetch(apiUrl(`/sites/${user.email}`));
@@ -59,7 +61,7 @@ export default function ManagerDashboard() {
     };
 
     if (!payload.lat || !payload.lng) {
-      alert("Please click the map to pick the site location.");
+      setMessage({ text: "Please click the map to pick the site location.", type: "error" });
       return;
     }
 
@@ -70,38 +72,43 @@ export default function ManagerDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
-    setSite({
-      name: "",
-      location: "",
-      joinKey: "",
-      radiusMeters: "150",
-      coords: null
-    });
+    if (res.ok) {
+      setSite({
+        name: "",
+        location: "",
+        joinKey: "",
+        radiusMeters: "150",
+        coords: null
+      });
 
-    loadSites();
+      loadSites();
+    }
   };
 
   const deleteSite = async (siteId) => {
-    const confirmDelete = window.confirm("Delete this site?");
-    if (!confirmDelete) return;
-
     const res = await fetch(apiUrl(`/sites/${siteId}`), {
       method: "DELETE"
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
-    loadSites();
+    if (res.ok) {
+      setDeleteSiteId("");
+      loadSites();
+    }
   };
 
   const createTask = async (site) => {
     const input = taskInputs[site._id];
-    if (!input?.email || !input?.desc) return alert("Fill all fields");
+    if (!input?.email || !input?.desc) {
+      setMessage({ text: "Fill all fields", type: "error" });
+      return;
+    }
 
-    await fetch(apiUrl("/tasks"), {
+    const res = await fetch(apiUrl("/tasks"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -112,8 +119,14 @@ export default function ManagerDashboard() {
       })
     });
 
-    alert("Task assigned");
-    setTaskInputs({ ...taskInputs, [site._id]: { email: "", desc: "" } });
+    if (res.ok) {
+      setMessage({ text: "Task assigned", type: "success" });
+      setTaskInputs({ ...taskInputs, [site._id]: { email: "", desc: "" } });
+      return;
+    }
+
+    const data = await res.json();
+    setMessage({ text: data.msg || "Error assigning task", type: "error" });
   };
 
   const loadTaskLog = async (siteId) => {
@@ -139,7 +152,7 @@ export default function ManagerDashboard() {
     });
 
     const data = await res.json();
-    alert(data.msg);
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
 
     if (res.ok) {
       loadHolidayRequests();
@@ -175,6 +188,12 @@ export default function ManagerDashboard() {
         <div className="dashboard-header">
           <h1>Manager Dashboard</h1>
         </div>
+
+        {message.text && (
+          <div className={`app-message app-message-${message.type}`}>
+            {message.text}
+          </div>
+        )}
 
         <div className="create-site-form" style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -310,10 +329,27 @@ export default function ManagerDashboard() {
 
               <button
                 className="delete-site-btn"
-                onClick={() => deleteSite(site._id)}
+                onClick={() =>
+                  setDeleteSiteId(deleteSiteId === site._id ? "" : site._id)
+                }
               >
                 Delete Site
               </button>
+
+              {deleteSiteId === site._id && (
+                <div className="inline-confirm-box">
+                  <p>Delete this site?</p>
+                  <div className="task-actions-row">
+                    <button onClick={() => deleteSite(site._id)}>Yes, delete</button>
+                    <button
+                      className="cancel-action-btn"
+                      onClick={() => setDeleteSiteId("")}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="task-section">
                 <h4>Assign Task</h4>
