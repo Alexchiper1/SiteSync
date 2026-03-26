@@ -67,6 +67,9 @@ export default function Register() {
 
       <div className="form-container">
         <form onSubmit={submit}>
+          <div className="form-top-link">
+            <Link to="/">Back to home</Link>
+          </div>
           <h2>Register</h2>
 
         {message.text && (

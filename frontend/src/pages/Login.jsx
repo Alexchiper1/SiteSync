@@ -45,6 +45,9 @@ export default function Login() {
     <>
       <Logo />
       <div className="form-container">
+      <div className="form-top-link">
+        <Link to="/">Back to home</Link>
+      </div>
       <h2>Login</h2>
 
       {message.text && (
