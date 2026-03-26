@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Register.css";
 import { apiUrl } from "../lib/api";
@@ -39,7 +39,7 @@ export default function Register() {
       }
 
       if (response.ok) {
-        navigate("/", {
+        navigate("/login", {
           state: {
             message: {
               text: "Account created successfully! You can now login.",
@@ -115,7 +115,7 @@ export default function Register() {
         
         <p>
           Already Have An Account?
-          <a href="./"> Login</a>
+          <Link to="/login"> Login</Link>
         </p>
       </form>
     </div>

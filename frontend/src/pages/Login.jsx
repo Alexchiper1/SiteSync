@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../css/Login.css";
 import { apiUrl } from "../lib/api";
@@ -71,7 +71,7 @@ export default function Login() {
 
       <p>
         Don't have an account?
-        <a href="/register"> Register</a>
+        <Link to="/register"> Register</Link>
       </p>
     </div>
     </>
