@@ -1,8 +1,16 @@
 .top-left-logo {
   position: fixed;
-  top: 5px;
-  left: 5px;
-  height: 150px;      
+  top: 16px;
+  left: 16px;
+  height: 96px;
   z-index: 1000;
   cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .top-left-logo {
+    top: 12px;
+    left: 12px;
+    height: 64px;
+  }
 }

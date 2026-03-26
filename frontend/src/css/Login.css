@@ -1,6 +1,7 @@
 .form-container {
   max-width: 400px;
-  margin: 50px auto;
+  width: calc(100% - 32px);
+  margin: 120px auto 40px;
   padding: 40px;
   background: #ffffff;
   border-radius: 12px;
@@ -22,4 +23,26 @@
 .form-top-link a {
   color: #0f766e;
   font-weight: 600;
+}
+
+.form-container p {
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .form-container {
+    width: calc(100% - 24px);
+    margin: 88px auto 24px;
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .form-container h2 {
+    margin-bottom: 22px;
+    font-size: 2rem;
+  }
+
+  .form-top-link {
+    margin-bottom: 10px;
+  }
 }
