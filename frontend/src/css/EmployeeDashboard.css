@@ -342,3 +342,117 @@
   min-width: 140px;
   margin-top: 0;
 }
+
+@media (max-width: 900px) {
+  .employee-dashboard {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    padding-top: 72px;
+  }
+
+  .profile-sidebar {
+    width: 100%;
+  }
+
+  .profile-card,
+  .dashboard-header,
+  .create-site-form,
+  .search-result-item,
+  .site-item,
+  .task-card {
+    border-radius: 16px;
+  }
+
+  .dashboard-header {
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .main-content h2 {
+    font-size: 1.9rem;
+    margin: 20px 0 14px;
+  }
+
+  .create-site-form {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .task-card {
+    padding: 18px;
+  }
+
+  .site-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .site-item button {
+    width: 100%;
+  }
+
+  .form-row,
+  .join-input-group,
+  .inline-action-box,
+  .task-actions {
+    flex-direction: column;
+  }
+
+  .form-row button,
+  .join-input-group button,
+  .inline-action-box button,
+  .task-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .inline-action-box input {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-dashboard {
+    padding: 12px;
+    padding-top: 64px;
+  }
+
+  .profile-card {
+    padding: 18px;
+  }
+
+  .profile-name {
+    font-size: 1.3rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .main-content h2 {
+    font-size: 1.55rem;
+  }
+
+  .create-site-form h2,
+  .site-tasks-header {
+    font-size: 1.2rem;
+  }
+
+  .task-card strong {
+    font-size: 1rem;
+  }
+
+  .search-result-item,
+  .task-card,
+  .site-item,
+  .create-site-form {
+    padding: 16px;
+  }
+}
