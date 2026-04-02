@@ -350,6 +350,52 @@
   text-align: left;
 }
 
+.manager-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.manager-modal-card {
+  width: min(100%, 420px);
+  padding: 24px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 22px 45px rgba(15, 23, 42, 0.18);
+}
+
+.manager-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.manager-modal-card h3 {
+  margin: 14px 0 8px;
+  color: #111827;
+  font-size: 1.35rem;
+}
+
+.manager-modal-card p {
+  margin: 0 0 18px;
+  text-align: left;
+  color: #4b5563;
+}
+
 .delete-site-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
@@ -515,6 +561,11 @@
   .task-item img {
     width: 100%;
     max-width: 100%;
+  }
+
+  .manager-modal-card {
+    padding: 20px;
+    border-radius: 18px;
   }
 }
 

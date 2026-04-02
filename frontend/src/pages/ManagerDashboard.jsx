@@ -167,6 +167,35 @@ export default function ManagerDashboard() {
 
   return (
     <div className="manager-dashboard">
+      {deleteSiteId && (
+        <div className="manager-modal-overlay" onClick={() => setDeleteSiteId("")}>
+          <div
+            className="manager-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="manager-modal-badge">Delete Site</span>
+            <h3>Delete this site?</h3>
+            <p>This will remove the site and its related data from the dashboard.</p>
+            <div className="task-actions-row">
+              <button
+                className="delete-site-btn"
+                type="button"
+                onClick={() => deleteSite(deleteSiteId)}
+              >
+                Delete
+              </button>
+              <button
+                className="cancel-action-btn"
+                type="button"
+                onClick={() => setDeleteSiteId("")}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="profile-sidebar">
         <div className="profile-card">
           <div className="profile-avatar">
@@ -347,21 +376,6 @@ export default function ManagerDashboard() {
 
               <strong>{site.name}</strong>
               <p>{site.location}</p>
-
-              {deleteSiteId === site._id && (
-                <div className="inline-confirm-box">
-                  <p>Delete this site?</p>
-                  <div className="task-actions-row">
-                    <button onClick={() => deleteSite(site._id)}>Yes, delete</button>
-                    <button
-                      className="cancel-action-btn"
-                      onClick={() => setDeleteSiteId("")}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
 
               <div className="task-section">
                 <h4>Assign Task</h4>
