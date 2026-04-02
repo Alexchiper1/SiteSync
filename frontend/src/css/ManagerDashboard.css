@@ -331,3 +331,195 @@
 .cancel-action-btn:hover {
   background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
 }
+
+.create-site-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 20px;
+  align-items: start;
+}
+
+.create-site-left,
+.create-site-right {
+  min-width: 0;
+}
+
+.coords-pill {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+@media (max-width: 900px) {
+  .manager-dashboard {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    padding-top: 72px;
+  }
+
+  .profile-sidebar {
+    width: 100%;
+  }
+
+  .profile-card,
+  .dashboard-header,
+  .create-site-form,
+  .site-card,
+  .task-log,
+  .task-item {
+    border-radius: 16px;
+  }
+
+  .dashboard-header {
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .main-content h2 {
+    font-size: 1.9rem;
+    margin: 20px 0 14px;
+  }
+
+  .create-site-form {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .site-card {
+    padding: 18px;
+  }
+
+  .form-row,
+  .task-inputs,
+  .task-actions-row {
+    flex-direction: column;
+  }
+
+  .form-row button,
+  .task-inputs button,
+  .task-actions-row button,
+  .site-card > button,
+  .task-section > button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .task-inputs input {
+    min-width: 0;
+  }
+
+  .create-site-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .create-site-right {
+    order: -1;
+  }
+
+  .attendance-header {
+    display: none;
+  }
+
+  .attendance-table {
+    display: grid;
+    gap: 12px;
+    border: none;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .attendance-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .attendance-row span {
+    display: block;
+    word-break: break-word;
+  }
+
+  .attendance-row span:nth-child(1)::before {
+    content: "Employee: ";
+    font-weight: 600;
+    color: #0f766e;
+  }
+
+  .attendance-row span:nth-child(2)::before {
+    content: "Site: ";
+    font-weight: 600;
+    color: #0f766e;
+  }
+
+  .attendance-row span:nth-child(3)::before {
+    content: "Check In: ";
+    font-weight: 600;
+    color: #0f766e;
+  }
+
+  .attendance-row span:nth-child(4)::before {
+    content: "Check Out: ";
+    font-weight: 600;
+    color: #0f766e;
+  }
+
+  .task-item img {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .manager-dashboard {
+    padding: 12px;
+    padding-top: 64px;
+  }
+
+  .profile-card {
+    padding: 18px;
+  }
+
+  .profile-name {
+    font-size: 1.3rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .main-content h2 {
+    font-size: 1.55rem;
+  }
+
+  .create-site-form h2 {
+    font-size: 1.2rem;
+  }
+
+  .site-card strong,
+  .task-item strong {
+    font-size: 1rem;
+  }
+
+  .site-card,
+  .create-site-form,
+  .task-item,
+  .attendance-row {
+    padding: 16px;
+  }
+}
