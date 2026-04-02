@@ -25,6 +25,14 @@
   font-weight: 600;
 }
 
+.field-error-message {
+  margin: -6px 0 14px;
+  color: #dc2626;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: left;
+}
+
 .form-container p {
   margin-top: 20px;
 }

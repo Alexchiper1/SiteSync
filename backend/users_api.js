@@ -17,6 +17,10 @@ router.post("/users", async (req, res) => {
       return res.status(400).json({ msg: "Missing required registration fields" });
     }
 
+    if (String(req.body.password).length < 6) {
+      return res.status(400).json({ msg: "Password must be a minimum of 6 characters." });
+    }
+
     const db = await getDb();
 
     const email = req.body.email.trim().toLowerCase();

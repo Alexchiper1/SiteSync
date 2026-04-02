@@ -13,6 +13,14 @@ export default function Register() {
   const submit = async (e) => {
     e.preventDefault();
 
+    if ((form.password || "").length < 6) {
+      setMessage({
+        text: "Password must be min 6 characters",
+        type: "error"
+      });
+      return;
+    }
+
     const newUser = {
       name: form.name?.trim(),
       email: form.email?.trim().toLowerCase(),
@@ -96,9 +104,14 @@ export default function Register() {
         <input
           type="password"
           placeholder="Password"
+          value={form.password || ""}
           onChange={e => setForm({ ...form, password: e.target.value })}
           required
         />
+
+        {(form.password || "").length > 0 && (form.password || "").length < 6 && (
+          <div className="field-error-message">Password must be min 6 characters</div>
+        )}
 
         <select onChange={e => setRole(e.target.value)}>
           <option value="employee">Employee</option>
