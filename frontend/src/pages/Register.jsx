@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
+import logo from "../pictures/LogoNoBack.png";
 import "../css/Register.css";
 import { apiUrl } from "../lib/api";
 
@@ -70,71 +70,75 @@ export default function Register() {
   };
 
   return (
-    <>
-       <Logo />
+    <div className="auth-page">
+      <div className="auth-page-header">
+        <Link to="/" className="auth-brand">
+          <img src={logo} alt="SiteSync Logo" className="auth-brand-logo" />
+          <span className="auth-brand-text">SiteSync</span>
+        </Link>
+      </div>
 
-      <div className="form-container">
+      <div className="form-container auth-form-card">
         <form onSubmit={submit}>
           <div className="form-top-link">
             <Link to="/">Back to home</Link>
           </div>
           <h2>Register</h2>
 
-        {message.text && (
-          <div className={`app-message app-message-${message.type}`}>
-            {message.text}
-          </div>
-        )}
+          {message.text && (
+            <div className={`auth-inline-message auth-inline-message-${message.type}`}>
+              {message.text}
+            </div>
+          )}
 
-
-        <input
-          type="text"
-          placeholder="Name"
-          onChange={e => setForm({ ...form, name: e.target.value })}
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={e => setForm({ ...form, email: e.target.value })}
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password || ""}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-          required
-        />
-
-        {(form.password || "").length > 0 && (form.password || "").length < 6 && (
-          <div className="field-error-message">Password must be min 6 characters</div>
-        )}
-
-        <select onChange={e => setRole(e.target.value)}>
-          <option value="employee">Employee</option>
-          <option value="manager">Manager</option>
-        </select>
-
-        {role === "manager" && (
           <input
             type="text"
-            placeholder="Company Name"
-            onChange={e => setForm({ ...form, companyName: e.target.value })}
+            placeholder="Name"
+            onChange={e => setForm({ ...form, name: e.target.value })}
             required
           />
-        )}
 
-        <button>Create Account</button>
-        
-        <p>
-          Already Have An Account?
-          <Link to="/login"> Login</Link>
-        </p>
-      </form>
+          <input
+            type="email"
+            placeholder="Email"
+            onChange={e => setForm({ ...form, email: e.target.value })}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password || ""}
+            onChange={e => setForm({ ...form, password: e.target.value })}
+            required
+          />
+
+          {(form.password || "").length > 0 && (form.password || "").length < 6 && (
+            <div className="field-error-message">Password must be min 6 characters</div>
+          )}
+
+          <select onChange={e => setRole(e.target.value)}>
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+          </select>
+
+          {role === "manager" && (
+            <input
+              type="text"
+              placeholder="Company Name"
+              onChange={e => setForm({ ...form, companyName: e.target.value })}
+              required
+            />
+          )}
+
+          <button>Create Account</button>
+          
+          <p>
+            Already Have An Account?
+            <Link to="/login"> Login</Link>
+          </p>
+        </form>
+      </div>
     </div>
-    </>
   );
 }

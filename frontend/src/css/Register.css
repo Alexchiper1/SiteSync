@@ -1,22 +1,61 @@
+.auth-page {
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4f7 100%);
+}
+
+.auth-page-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f766e;
+  text-decoration: none;
+}
+
+.auth-brand:hover {
+  text-decoration: none;
+}
+
+.auth-brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.auth-brand-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .form-container {
   max-width: 400px;
   width: calc(100% - 32px);
-  margin: 120px auto 40px;
+  margin: 0 auto 40px;
   padding: 40px;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 24px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 }
 
 .form-container h2 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 22px;
   color: #14b8a6;
+  font-size: 2.3rem;
 }
 
 .form-top-link {
-  margin-bottom: 12px;
+  margin-bottom: 18px;
   text-align: left;
 }
 
@@ -33,24 +72,70 @@
   text-align: left;
 }
 
+.auth-inline-message {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-align: left;
+}
+
+.auth-inline-message-success {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.auth-inline-message-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.auth-inline-message-info {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
 .form-container p {
   margin-top: 20px;
 }
 
 @media (max-width: 640px) {
+  .auth-page {
+    padding: 18px 12px 28px;
+  }
+
+  .auth-page-header {
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    padding-left: 6px;
+  }
+
+  .auth-brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .auth-brand-text {
+    font-size: 0.95rem;
+  }
+
   .form-container {
     width: calc(100% - 24px);
-    margin: 88px auto 24px;
-    padding: 24px 18px;
-    border-radius: 18px;
+    margin: 0 auto 24px;
+    padding: 24px 18px 22px;
+    border-radius: 22px;
   }
 
   .form-container h2 {
-    margin-bottom: 22px;
-    font-size: 2rem;
+    margin-bottom: 18px;
+    font-size: 1.95rem;
   }
 
   .form-top-link {
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
 }

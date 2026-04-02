@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
+import logo from "../pictures/LogoNoBack.png";
 import "../css/Login.css";
 import { apiUrl } from "../lib/api";
 
@@ -42,41 +42,47 @@ export default function Login() {
   };
 
   return (
-    <>
-      <Logo />
-      <div className="form-container">
-      <div className="form-top-link">
-        <Link to="/">Back to home</Link>
+    <div className="auth-page">
+      <div className="auth-page-header">
+        <Link to="/" className="auth-brand">
+          <img src={logo} alt="SiteSync Logo" className="auth-brand-logo" />
+          <span className="auth-brand-text">SiteSync</span>
+        </Link>
       </div>
-      <h2>Login</h2>
 
-      {message.text && (
-        <div className={`app-message app-message-${message.type}`}>
-          {message.text}
+      <div className="form-container auth-form-card">
+        <div className="form-top-link">
+          <Link to="/">Back to home</Link>
         </div>
-      )}
+        <h2>Login</h2>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
+        {message.text && (
+          <div className={`auth-inline-message auth-inline-message-${message.type}`}>
+            {message.text}
+          </div>
+        )}
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
 
-      <button onClick={handleLogin}>Login</button>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
 
-      <p>
-        Don't have an account?
-        <Link to="/register"> Register</Link>
-      </p>
+        <button onClick={handleLogin}>Login</button>
+
+        <p>
+          Don't have an account?
+          <Link to="/register"> Register</Link>
+        </p>
+      </div>
     </div>
-    </>
   );
 }
