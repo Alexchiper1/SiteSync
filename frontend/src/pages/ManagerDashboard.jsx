@@ -324,17 +324,29 @@ export default function ManagerDashboard() {
         ) : (
           sites.map((site) => (
             <div key={site._id} className="site-card">
-              <strong>{site.name}</strong>
-              <p>{site.location}</p>
-
               <button
-                className="delete-site-btn"
+                className="site-icon-button delete-site-icon"
+                type="button"
+                aria-label={`Delete ${site.name}`}
+                title="Delete site"
                 onClick={() =>
                   setDeleteSiteId(deleteSiteId === site._id ? "" : site._id)
                 }
               >
-                Delete Site
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="site-icon-svg"
+                >
+                  <path
+                    d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 12c-1.1 0-2-.9-2-2V8h12v11c0 1.1-.9 2-2 2H8z"
+                    fill="currentColor"
+                  />
+                </svg>
               </button>
+
+              <strong>{site.name}</strong>
+              <p>{site.location}</p>
 
               {deleteSiteId === site._id && (
                 <div className="inline-confirm-box">

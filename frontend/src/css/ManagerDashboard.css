@@ -153,6 +153,7 @@
 }
 
 .site-card {
+  position: relative;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -173,6 +174,39 @@
   display: block;
   margin-bottom: 10px;
   font-weight: 600;
+  padding-right: 48px;
+}
+
+.site-icon-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 1rem;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+.delete-site-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.22);
+}
+
+.delete-site-icon:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.site-icon-svg {
+  width: 18px;
+  height: 18px;
 }
 
 .task-section {
@@ -411,7 +445,6 @@
   .form-row button,
   .task-inputs button,
   .task-actions-row button,
-  .site-card > button,
   .task-section > button {
     width: 100%;
     min-width: 0;
@@ -521,5 +554,18 @@
   .task-item,
   .attendance-row {
     padding: 16px;
+  }
+
+  .site-icon-button {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .site-icon-svg {
+    width: 16px;
+    height: 16px;
   }
 }
