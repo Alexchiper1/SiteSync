@@ -225,10 +225,21 @@ export default function ManagerDashboard() {
         )}
 
         <div className="create-site-form" style={{ marginBottom: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2 style={{ margin: 0 }}>Today's Check-Ins</h2>
-            <button onClick={loadAttendance} style={{ height: 36 }}>
-              Refresh
+          <div className="section-header-row">
+            <h2>Today's Check-Ins</h2>
+            <button
+              type="button"
+              className="header-icon-button"
+              aria-label="Refresh check-ins"
+              title="Refresh check-ins"
+              onClick={loadAttendance}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="site-icon-svg">
+                <path
+                  d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"
+                  fill="currentColor"
+                />
+              </svg>
             </button>
           </div>
 
@@ -273,10 +284,21 @@ export default function ManagerDashboard() {
         </div>
 
         <div className="create-site-form" style={{ marginBottom: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2 style={{ margin: 0 }}>Holiday Requests</h2>
-            <button onClick={loadHolidayRequests} style={{ height: 36 }}>
-              Refresh
+          <div className="section-header-row">
+            <h2>Holiday Requests</h2>
+            <button
+              type="button"
+              className="header-icon-button"
+              aria-label="Refresh holiday requests"
+              title="Refresh holiday requests"
+              onClick={loadHolidayRequests}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="site-icon-svg">
+                <path
+                  d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"
+                  fill="currentColor"
+                />
+              </svg>
             </button>
           </div>
 
