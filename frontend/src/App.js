@@ -6,6 +6,7 @@ import ManagerDashboard from "./pages/ManagerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import ManagerProfilePage from "./pages/ManagerProfilePage";
 import ManagerPlaceholderPage from "./pages/ManagerPlaceholderPage";
+import ManagerSitesPage from "./pages/ManagerSitesPage";
 
 function App() {
   return (
@@ -16,15 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/manager" element={<ManagerDashboard />} />
         <Route path="/manager/profile" element={<ManagerProfilePage />} />
-        <Route
-          path="/manager/sites"
-          element={
-            <ManagerPlaceholderPage
-              title="Manager Sites Page"
-              description="This temporary page will become the full site management area for creating, editing, deleting, and reviewing sites."
-            />
-          }
-        />
+        <Route path="/manager/sites" element={<ManagerSitesPage />} />
         <Route
           path="/manager/employees"
           element={
