@@ -4,9 +4,27 @@
   padding: 32px 20px;
 }
 
+.manager-section-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 32px 20px;
+}
+
+.manager-section-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.manager-section-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .manager-profile-shell {
   max-width: 720px;
-  margin: 0 auto;
 }
 
 .manager-profile-topbar {
@@ -31,8 +49,38 @@
   font-size: 1.8rem;
 }
 
+.manager-section-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.manager-section-card p {
+  text-align: left;
+  max-width: 640px;
+}
+
+.manager-section-badge {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 @media (max-width: 640px) {
   .manager-profile-page {
+    padding: 20px 14px;
+  }
+
+  .manager-section-page {
     padding: 20px 14px;
   }
 
@@ -41,6 +89,12 @@
   }
 
   .profile-edit-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 960px) {
+  .manager-section-layout {
     flex-direction: column;
   }
 }

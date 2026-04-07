@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
 import { apiUrl, profileImageUrl, taskImageUrl } from "../lib/api";
+import ManagerSidebar from "../components/ManagerSidebar";
 
 export default function ManagerDashboard() {
   const [currentUser, setCurrentUser] = useState(
@@ -259,6 +260,8 @@ export default function ManagerDashboard() {
 
   return (
     <div className="manager-dashboard">
+      <ManagerSidebar />
+
       {deleteSiteId && (
         <div className="manager-modal-overlay" onClick={() => setDeleteSiteId("")}>
           <div

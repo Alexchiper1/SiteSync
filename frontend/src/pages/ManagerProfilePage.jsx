@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import "../css/ManagerProfilePage.css";
 import { apiUrl, profileImageUrl } from "../lib/api";
+import ManagerSidebar from "../components/ManagerSidebar";
 
 export default function ManagerProfilePage() {
   const [currentUser, setCurrentUser] = useState(
@@ -78,99 +79,107 @@ export default function ManagerProfilePage() {
 
   return (
     <div className="manager-profile-page">
-      <div className="manager-profile-shell">
-        <div className="manager-profile-topbar">
-          <Link to="/manager" className="manager-profile-back-link">
-            Back to dashboard
-          </Link>
-        </div>
+      <div className="manager-section-layout">
+        <ManagerSidebar />
 
-        {message.text && (
-          <div className={`app-message app-message-${message.type}`}>
-            {message.text}
-          </div>
-        )}
+        <main className="manager-section-main">
+          <div className="manager-profile-shell">
+            <div className="manager-profile-topbar">
+              <Link to="/manager" className="manager-profile-back-link">
+                Back to dashboard
+              </Link>
+            </div>
 
-        <div className="profile-card manager-profile-card">
-          <div
-            className={`profile-avatar ${isEditingProfile ? "profile-avatar-editable" : ""}`}
-            onClick={() => isEditingProfile && setShowPhotoOptions(true)}
-            role={isEditingProfile ? "button" : undefined}
-            tabIndex={isEditingProfile ? 0 : undefined}
-            onKeyDown={(e) => {
-              if (isEditingProfile && (e.key === "Enter" || e.key === " ")) {
-                e.preventDefault();
-                setShowPhotoOptions(true);
-              }
-            }}
-          >
-            <img
-              src={profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"}
-              alt="Profile"
-            />
-          </div>
+            {message.text && (
+              <div className={`app-message app-message-${message.type}`}>
+                {message.text}
+              </div>
+            )}
 
-          <h1 className="manager-profile-title">Manager Profile</h1>
-          <h3 className="profile-name">{currentUser?.name || "Manager"}</h3>
-          <p className="profile-role">Manager</p>
-          <p className="profile-details">{currentUser?.email}</p>
-          <p className="profile-company">
-            <strong>Company:</strong> {currentUser?.companyName}
-          </p>
+            <div className="profile-card manager-profile-card">
+              <div
+                className={`profile-avatar ${isEditingProfile ? "profile-avatar-editable" : ""}`}
+                onClick={() => isEditingProfile && setShowPhotoOptions(true)}
+                role={isEditingProfile ? "button" : undefined}
+                tabIndex={isEditingProfile ? 0 : undefined}
+                onKeyDown={(e) => {
+                  if (isEditingProfile && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    setShowPhotoOptions(true);
+                  }
+                }}
+              >
+                <img
+                  src={
+                    profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"
+                  }
+                  alt="Profile"
+                />
+              </div>
 
-          {!isEditingProfile ? (
-            <button
-              type="button"
-              className="profile-edit-toggle"
-              onClick={startEditingProfile}
-            >
-              Edit Profile
-            </button>
-          ) : (
-            <div className="profile-edit-box">
-              <input
-                type="text"
-                value={profileName}
-                placeholder="Update your name"
-                onChange={(e) => setProfileName(e.target.value)}
-              />
-              <p className="profile-edit-hint">
-                Tap the profile picture to upload or take a new photo.
+              <h1 className="manager-profile-title">Manager Profile</h1>
+              <h3 className="profile-name">{currentUser?.name || "Manager"}</h3>
+              <p className="profile-role">Manager</p>
+              <p className="profile-details">{currentUser?.email}</p>
+              <p className="profile-company">
+                <strong>Company:</strong> {currentUser?.companyName}
               </p>
-              <input
-                ref={uploadInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden-file-input"
-                onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
-              />
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="user"
-                className="hidden-file-input"
-                onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
-              />
-              <div className="profile-edit-actions">
-                <button type="button" className="profile-save-button" onClick={saveProfile}>
-                  Save Changes
-                </button>
+
+              {!isEditingProfile ? (
                 <button
                   type="button"
-                  className="profile-cancel-button"
-                  onClick={cancelEditingProfile}
+                  className="profile-edit-toggle"
+                  onClick={startEditingProfile}
                 >
-                  Cancel
+                  Edit Profile
                 </button>
-              </div>
-            </div>
-          )}
+              ) : (
+                <div className="profile-edit-box">
+                  <input
+                    type="text"
+                    value={profileName}
+                    placeholder="Update your name"
+                    onChange={(e) => setProfileName(e.target.value)}
+                  />
+                  <p className="profile-edit-hint">
+                    Tap the profile picture to upload or take a new photo.
+                  </p>
+                  <input
+                    ref={uploadInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden-file-input"
+                    onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
+                  />
+                  <input
+                    ref={cameraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="user"
+                    className="hidden-file-input"
+                    onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
+                  />
+                  <div className="profile-edit-actions">
+                    <button type="button" className="profile-save-button" onClick={saveProfile}>
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      className="profile-cancel-button"
+                      onClick={cancelEditingProfile}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+              <button className="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </main>
       </div>
 
       {showPhotoOptions && (
