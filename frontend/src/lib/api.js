@@ -19,3 +19,7 @@ export function taskImageUrl(image) {
 
   return `${localApiBase}/uploads/${image}`;
 }
+
+export function profileImageUrl(image) {
+  return taskImageUrl(image);
+}

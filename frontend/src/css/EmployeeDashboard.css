@@ -57,6 +57,88 @@
   margin-bottom: 20px;
 }
 
+.profile-edit-box {
+  margin-top: 12px;
+}
+
+.profile-edit-box input[type="text"],
+.profile-edit-box input[type="file"] {
+  margin-bottom: 10px;
+}
+
+.profile-save-button {
+  margin-top: 0;
+}
+
+.profile-edit-toggle {
+  margin-top: 0;
+}
+
+.profile-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.profile-cancel-button {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.profile-cancel-button:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+.profile-edit-hint {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  text-align: left;
+  color: #6b7280;
+}
+
+.profile-avatar-editable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-avatar-editable:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(20, 184, 166, 0.2);
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.profile-photo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.profile-photo-modal-card {
+  width: min(100%, 360px);
+  padding: 24px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 22px 45px rgba(15, 23, 42, 0.18);
+}
+
+.profile-photo-modal-card h4 {
+  margin: 0 0 16px;
+  color: #111827;
+}
+
+.profile-photo-modal-card button {
+  margin-top: 0;
+}
+
 .logout-button {
   width: 100%;
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);

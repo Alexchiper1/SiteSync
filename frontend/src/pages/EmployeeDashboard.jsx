@@ -1,14 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/EmployeeDashboard.css";
-import { apiUrl } from "../lib/api";
+import { apiUrl, profileImageUrl } from "../lib/api";
 import SiteLiveMap from "../components/SiteLiveMap";
 import { haversineMeters } from "../utils/distance";
 
 export default function EmployeeDashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("user"))
+  );
   const navigate = useNavigate();
   const [message, setMessage] = useState({ text: "", type: "info" });
+  const [profileName, setProfileName] = useState(
+    JSON.parse(localStorage.getItem("user"))?.name || ""
+  );
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+  const uploadInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -35,24 +45,24 @@ export default function EmployeeDashboard() {
 
   const loadMySites = useCallback(async () => {
     const res = await fetch(
-      apiUrl(`/employee-sites/${user.email.trim().toLowerCase()}`)
+      apiUrl(`/employee-sites/${currentUser.email.trim().toLowerCase()}`)
     );
     setMySites(await res.json());
-  }, [user.email]);
+  }, [currentUser.email]);
 
   const loadTasks = useCallback(async () => {
     const res = await fetch(
-      apiUrl(`/tasks/${user.email.trim().toLowerCase()}`)
+      apiUrl(`/tasks/${currentUser.email.trim().toLowerCase()}`)
     );
     setTasks(await res.json());
-  }, [user.email]);
+  }, [currentUser.email]);
 
   const loadHolidayRequests = useCallback(async () => {
     const res = await fetch(
-      apiUrl(`/holiday-requests/employee/${user.email.trim().toLowerCase()}`)
+      apiUrl(`/holiday-requests/employee/${currentUser.email.trim().toLowerCase()}`)
     );
     setHolidayRequests(await res.json());
-  }, [user.email]);
+  }, [currentUser.email]);
 
   useEffect(() => {
     loadMySites();
@@ -137,7 +147,7 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({
         siteId,
         joinKey: joinKeys[siteId],
-        employeeEmail: user.email.trim().toLowerCase()
+        employeeEmail: currentUser.email.trim().toLowerCase()
       })
     });
 
@@ -167,8 +177,8 @@ export default function EmployeeDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         siteId: selectedSiteId,
-        employeeEmail: user.email,
-        employeeName: user.name,
+        employeeEmail: currentUser.email,
+        employeeName: currentUser.name,
         employeeLat: userPos.lat,
         employeeLng: userPos.lng
       })
@@ -199,7 +209,7 @@ export default function EmployeeDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         siteId: selectedSiteId,
-        employeeEmail: user.email,
+        employeeEmail: currentUser.email,
         employeeLat: userPos.lat,
         employeeLng: userPos.lng
       })
@@ -280,8 +290,8 @@ export default function EmployeeDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         siteId: holidayForm.siteId,
-        employeeEmail: user.email,
-        employeeName: user.name,
+        employeeEmail: currentUser.email,
+        employeeName: currentUser.name,
         startDate: holidayForm.startDate,
         endDate: holidayForm.endDate,
         reason: holidayForm.reason
@@ -307,6 +317,58 @@ export default function EmployeeDashboard() {
     navigate("/");
   };
 
+  const saveProfile = async () => {
+    const trimmedName = profileName.trim();
+    if (!trimmedName) {
+      setMessage({ text: "Name cannot be empty", type: "error" });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("email", currentUser.email);
+    formData.append("name", trimmedName);
+
+    if (profileImageFile) {
+      formData.append("profileImage", profileImageFile);
+    }
+
+    const res = await fetch(apiUrl("/users/profile"), {
+      method: "PUT",
+      body: formData
+    });
+
+    const data = await res.json();
+    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
+
+    if (res.ok && data.user) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setCurrentUser(data.user);
+      setProfileName(data.user.name || "");
+      setProfileImageFile(null);
+      setIsEditingProfile(false);
+      setShowPhotoOptions(false);
+    }
+  };
+
+  const startEditingProfile = () => {
+    setProfileName(currentUser?.name || "");
+    setProfileImageFile(null);
+    setIsEditingProfile(true);
+  };
+
+  const cancelEditingProfile = () => {
+    setProfileName(currentUser?.name || "");
+    setProfileImageFile(null);
+    setIsEditingProfile(false);
+    setShowPhotoOptions(false);
+  };
+
+  const handleProfileFileChange = (file) => {
+    if (!file) return;
+    setProfileImageFile(file);
+    setShowPhotoOptions(false);
+  };
+
   // group tasks by site
   const tasksBySite = {};
   tasks.forEach((task) => {
@@ -320,21 +382,107 @@ export default function EmployeeDashboard() {
     <div className="employee-dashboard">
       <div className="profile-sidebar">
         <div className="profile-card">
-          <div className="profile-avatar">
-            <img src="" alt="Profile" />
+          <div
+            className={`profile-avatar ${isEditingProfile ? "profile-avatar-editable" : ""}`}
+            onClick={() => isEditingProfile && setShowPhotoOptions(true)}
+            role={isEditingProfile ? "button" : undefined}
+            tabIndex={isEditingProfile ? 0 : undefined}
+            onKeyDown={(e) => {
+              if (isEditingProfile && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                setShowPhotoOptions(true);
+              }
+            }}
+          >
+            <img
+              src={profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"}
+              alt="Profile"
+            />
           </div>
-          <h3 className="profile-name">{user?.name || "Employee"}</h3>
+          <h3 className="profile-name">{currentUser?.name || "Employee"}</h3>
           <p className="profile-role">Construction Worker</p>
-          <p className="profile-details">{user?.email}</p>
+          <p className="profile-details">{currentUser?.email}</p>
+          {!isEditingProfile ? (
+            <button
+              type="button"
+              className="profile-edit-toggle"
+              onClick={startEditingProfile}
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <div className="profile-edit-box">
+              <input
+                type="text"
+                value={profileName}
+                placeholder="Update your name"
+                onChange={(e) => setProfileName(e.target.value)}
+              />
+              <p className="profile-edit-hint">
+                Tap the profile picture to upload or take a new photo.
+              </p>
+              <input
+                ref={uploadInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden-file-input"
+                onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="user"
+                className="hidden-file-input"
+                onChange={(e) => handleProfileFileChange(e.target.files?.[0] || null)}
+              />
+              <div className="profile-edit-actions">
+                <button type="button" className="profile-save-button" onClick={saveProfile}>
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="profile-cancel-button"
+                  onClick={cancelEditingProfile}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
           <button className="logout-button" onClick={handleLogout}>
             Logout
           </button>
         </div>
       </div>
 
+      {showPhotoOptions && (
+        <div className="profile-photo-modal" onClick={() => setShowPhotoOptions(false)}>
+          <div
+            className="profile-photo-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4>Change profile picture</h4>
+            <button type="button" onClick={() => uploadInputRef.current?.click()}>
+              Upload Picture
+            </button>
+            <button type="button" onClick={() => cameraInputRef.current?.click()}>
+              Take Picture
+            </button>
+            <button
+              type="button"
+              className="profile-cancel-button"
+              onClick={() => setShowPhotoOptions(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="main-content">
         <div className="dashboard-header">
-          <h1>Hello {user?.name?.split(" ")[0] || "Employee"}!</h1>
+          <h1>Hello {currentUser?.name?.split(" ")[0] || "Employee"}!</h1>
         </div>
 
         {message.text && (
