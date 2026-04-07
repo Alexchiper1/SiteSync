@@ -64,6 +64,13 @@
   margin-bottom: 20px;
 }
 
+.profile-page-link {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
 .profile-edit-box {
   margin-top: 12px;
 }

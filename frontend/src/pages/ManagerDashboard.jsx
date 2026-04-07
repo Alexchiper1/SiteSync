@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
 import { apiUrl, profileImageUrl, taskImageUrl } from "../lib/api";
@@ -313,6 +313,9 @@ export default function ManagerDashboard() {
           <p className="profile-company">
             <strong>Company:</strong> {currentUser?.companyName}
           </p>
+          <Link to="/manager/profile" className="profile-page-link">
+            Open Profile Page
+          </Link>
           {!isEditingProfile ? (
             <button
               type="button"
