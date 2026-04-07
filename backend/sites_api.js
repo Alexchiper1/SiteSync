@@ -25,6 +25,63 @@ router.get("/sites/:managerEmail", async (req, res) => {
   res.json(sites);
 });
 
+// update site
+router.put("/sites/:siteId", async (req, res) => {
+  try {
+    const db = await getDb();
+    const siteId = req.params.siteId;
+    const existingSite = await db.collection("sites").findOne({
+      _id: new ObjectId(siteId)
+    });
+
+    if (!existingSite) {
+      return res.status(404).json({ msg: "Site not found" });
+    }
+
+    const updates = {
+      name: req.body.name,
+      location: req.body.location,
+      joinKey: req.body.joinKey,
+      radiusMeters: Number(req.body.radiusMeters),
+      lat: req.body.lat,
+      lng: req.body.lng,
+      managerEmail: req.body.managerEmail
+    };
+
+    await db.collection("sites").updateOne(
+      { _id: new ObjectId(siteId) },
+      { $set: updates }
+    );
+
+    if (existingSite.name !== updates.name) {
+      await db.collection("siteMembers").updateMany(
+        { siteId },
+        { $set: { siteName: updates.name } }
+      );
+
+      await db.collection("tasks").updateMany(
+        { siteId },
+        { $set: { siteName: updates.name } }
+      );
+
+      await db.collection("attendance").updateMany(
+        { siteId },
+        { $set: { siteName: updates.name } }
+      );
+
+      await db.collection("holidayRequests").updateMany(
+        { siteId },
+        { $set: { siteName: updates.name } }
+      );
+    }
+
+    res.json({ msg: "Site updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Error updating site" });
+  }
+});
+
 // get one site by id (for employee map/check-in)
 router.get("/site/:siteId", async (req, res) => {
   try {

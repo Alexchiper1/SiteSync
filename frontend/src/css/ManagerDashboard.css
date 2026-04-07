@@ -189,6 +189,18 @@
   padding-right: 48px;
 }
 
+.edit-site-btn {
+  width: auto;
+  min-width: 120px;
+  margin-top: 6px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.edit-site-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
 .site-icon-button {
   position: absolute;
   top: 16px;
@@ -445,6 +457,13 @@
   background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
 }
 
+.compact-action-btn {
+  width: auto;
+  min-width: 130px;
+  margin: 0;
+  padding: 10px 16px;
+}
+
 .create-site-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
@@ -524,7 +543,8 @@
   .form-row button,
   .task-inputs button,
   .task-actions-row button,
-  .task-section > button {
+  .task-section > button,
+  .edit-site-btn {
     width: 100%;
     min-width: 0;
   }

@@ -24,6 +24,7 @@ export default function ManagerDashboard() {
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [requestNotes, setRequestNotes] = useState({});
   const [deleteSiteId, setDeleteSiteId] = useState("");
+  const [editingSiteId, setEditingSiteId] = useState("");
 
   const loadSites = useCallback(async () => {
     const res = await fetch(apiUrl(`/sites/${user.email}`));
@@ -65,8 +66,9 @@ export default function ManagerDashboard() {
       return;
     }
 
-    const res = await fetch(apiUrl("/sites"), {
-      method: "POST",
+    const isEditing = Boolean(editingSiteId);
+    const res = await fetch(apiUrl(isEditing ? `/sites/${editingSiteId}` : "/sites"), {
+      method: isEditing ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
@@ -82,9 +84,37 @@ export default function ManagerDashboard() {
         radiusMeters: "150",
         coords: null
       });
+      setEditingSiteId("");
 
       loadSites();
     }
+  };
+
+  const startEditSite = (siteToEdit) => {
+    setEditingSiteId(siteToEdit._id);
+    setSite({
+      name: siteToEdit.name || "",
+      location: siteToEdit.location || "",
+      joinKey: siteToEdit.joinKey || "",
+      radiusMeters: String(siteToEdit.radiusMeters ?? 150),
+      coords:
+        siteToEdit.lat != null && siteToEdit.lng != null
+          ? { lat: siteToEdit.lat, lng: siteToEdit.lng }
+          : null
+    });
+
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
+  const cancelEditSite = () => {
+    setEditingSiteId("");
+    setSite({
+      name: "",
+      location: "",
+      joinKey: "",
+      radiusMeters: "150",
+      coords: null
+    });
   };
 
   const deleteSite = async (siteId) => {
@@ -399,6 +429,14 @@ export default function ManagerDashboard() {
               <strong>{site.name}</strong>
               <p>{site.location}</p>
 
+              <button
+                className="edit-site-btn"
+                type="button"
+                onClick={() => startEditSite(site)}
+              >
+                Edit Site
+              </button>
+
               <div className="task-section">
                 <h4>Assign Task</h4>
                 <div className="task-inputs">
@@ -466,7 +504,18 @@ export default function ManagerDashboard() {
         )}
 
         <div className="create-site-form">
-          <h2>Create Site</h2>
+          <div className="section-header-row">
+            <h2>{editingSiteId ? "Edit Site" : "Create Site"}</h2>
+            {editingSiteId && (
+              <button
+                type="button"
+                className="cancel-action-btn compact-action-btn"
+                onClick={cancelEditSite}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
           <form onSubmit={createSite} className="create-site-grid">
             <div className="create-site-left">
               <input
@@ -502,7 +551,7 @@ export default function ManagerDashboard() {
                 onChange={(e) => setSite({ ...site, joinKey: e.target.value })}
               />
               <button className="create-site-btn" type="submit">
-                Create Site
+                {editingSiteId ? "Save Changes" : "Create Site"}
               </button>
             </div>
 
