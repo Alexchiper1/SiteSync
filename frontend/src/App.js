@@ -10,6 +10,8 @@ import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 import ManagerTasksPage from "./pages/ManagerTasksPage";
 import ManagerAttendancePage from "./pages/ManagerAttendancePage";
 import ManagerHolidayRequestsPage from "./pages/ManagerHolidayRequestsPage";
+import EmployeeProfilePage from "./pages/EmployeeProfilePage";
+import EmployeePlaceholderPage from "./pages/EmployeePlaceholderPage";
 
 function App() {
   return (
@@ -26,6 +28,43 @@ function App() {
         <Route path="/manager/attendance" element={<ManagerAttendancePage />} />
         <Route path="/manager/holidays" element={<ManagerHolidayRequestsPage />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
+        <Route path="/employee/profile" element={<EmployeeProfilePage />} />
+        <Route
+          path="/employee/sites"
+          element={
+            <EmployeePlaceholderPage
+              title="Employee Sites Page"
+              description="This temporary page will become the full employee site area for joined sites, search, and site-related actions."
+            />
+          }
+        />
+        <Route
+          path="/employee/tasks"
+          element={
+            <EmployeePlaceholderPage
+              title="Employee Tasks Page"
+              description="This temporary page will become the task area for task tracking, uploads, and status updates."
+            />
+          }
+        />
+        <Route
+          path="/employee/attendance"
+          element={
+            <EmployeePlaceholderPage
+              title="Employee Attendance Page"
+              description="This temporary page will become the attendance area for check-ins, check-outs, and geolocation status."
+            />
+          }
+        />
+        <Route
+          path="/employee/holidays"
+          element={
+            <EmployeePlaceholderPage
+              title="Employee Holiday Page"
+              description="This temporary page will become the holiday request area for new requests and request history."
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

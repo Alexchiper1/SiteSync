@@ -1,0 +1,167 @@
+.employee-profile-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 32px 20px;
+}
+
+.employee-section-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 32px 20px;
+}
+
+.employee-section-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.employee-section-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.employee-profile-shell {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.employee-profile-card {
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.employee-profile-title {
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.employee-section-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.employee-section-card p {
+  text-align: left;
+  max-width: 640px;
+}
+
+.employee-section-badge {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 960px) {
+  .employee-section-layout {
+    flex-direction: column;
+  }
+
+  .employee-section-page .employee-section-main {
+    width: 100%;
+    padding-top: 76px;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-profile-page {
+    padding: 0;
+  }
+
+  .employee-section-page {
+    padding: 20px 14px;
+  }
+
+  .employee-profile-page .employee-section-layout {
+    display: block;
+    min-height: 100vh;
+    max-width: none;
+  }
+
+  .employee-profile-page .employee-section-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 18px 16px;
+  }
+
+  .employee-profile-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 430px);
+    max-width: 430px;
+    min-height: 100vh;
+  }
+
+  .employee-profile-card {
+    max-width: 100%;
+    width: 100%;
+    padding: 26px 24px;
+    border-radius: 22px;
+  }
+
+  .employee-profile-title {
+    font-size: 2rem;
+    margin-bottom: 16px;
+  }
+
+  .employee-profile-card .profile-avatar {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 18px;
+  }
+
+  .employee-profile-card .profile-name {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  .employee-profile-card .profile-role,
+  .employee-profile-card .profile-details {
+    font-size: 1.02rem;
+  }
+
+  .profile-card.employee-profile-card button {
+    padding: 12px 18px;
+  }
+
+  .profile-edit-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+  .employee-profile-page .employee-section-main {
+    padding: 16px 12px;
+  }
+
+  .employee-profile-shell {
+    width: 100%;
+  }
+
+  .employee-profile-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .employee-profile-title {
+    font-size: 1.8rem;
+  }
+}

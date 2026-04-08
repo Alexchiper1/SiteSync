@@ -4,6 +4,7 @@ import "../css/EmployeeDashboard.css";
 import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 import SiteLiveMap from "../components/SiteLiveMap";
 import { haversineMeters } from "../utils/distance";
+import EmployeeSidebar from "../components/EmployeeSidebar";
 
 export default function EmployeeDashboard() {
   const [currentUser, setCurrentUser] = useState(
@@ -380,6 +381,8 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="employee-dashboard">
+      <EmployeeSidebar />
+
       <div className="profile-sidebar">
         <div className="profile-card">
           <div
