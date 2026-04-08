@@ -9,6 +9,7 @@ import ManagerPlaceholderPage from "./pages/ManagerPlaceholderPage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 import ManagerTasksPage from "./pages/ManagerTasksPage";
+import ManagerAttendancePage from "./pages/ManagerAttendancePage";
 
 function App() {
   return (
@@ -22,15 +23,7 @@ function App() {
         <Route path="/manager/sites" element={<ManagerSitesPage />} />
         <Route path="/manager/employees" element={<ManagerEmployeesPage />} />
         <Route path="/manager/tasks" element={<ManagerTasksPage />} />
-        <Route
-          path="/manager/attendance"
-          element={
-            <ManagerPlaceholderPage
-              title="Manager Attendance Page"
-              description="This temporary page will become the attendance monitoring area for check-ins, check-outs, and daily records."
-            />
-          }
-        />
+        <Route path="/manager/attendance" element={<ManagerAttendancePage />} />
         <Route
           path="/manager/holidays"
           element={

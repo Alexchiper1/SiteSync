@@ -170,4 +170,43 @@ router.get("/attendance/manager/:managerEmail", async (req, res) => {
   }
 });
 
+router.get("/attendance/manager-history/:managerEmail", async (req, res) => {
+  try {
+    const db = await getDb();
+    const managerEmail = normalizeEmail(req.params.managerEmail);
+
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    let start;
+    let end;
+
+    if (startDate && endDate) {
+      start = new Date(`${startDate}T00:00:00.000Z`);
+      end = new Date(`${endDate}T00:00:00.000Z`);
+      end.setUTCDate(end.getUTCDate() + 1);
+    } else {
+      end = new Date();
+      end.setUTCHours(23, 59, 59, 999);
+      start = new Date(end);
+      start.setUTCDate(start.getUTCDate() - 6);
+      start.setUTCHours(0, 0, 0, 0);
+    }
+
+    const rows = await db
+      .collection("attendance")
+      .find({
+        managerEmail,
+        checkInAt: { $gte: start, $lt: end }
+      })
+      .sort({ checkInAt: -1 })
+      .toArray();
+
+    res.json(rows);
+  } catch (err) {
+    console.error("GET /attendance/manager-history failed:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
+  }
+});
+
 export default router;
