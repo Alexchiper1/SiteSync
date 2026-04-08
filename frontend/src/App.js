@@ -5,11 +5,11 @@ import Register from "./pages/Register";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import ManagerProfilePage from "./pages/ManagerProfilePage";
-import ManagerPlaceholderPage from "./pages/ManagerPlaceholderPage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 import ManagerTasksPage from "./pages/ManagerTasksPage";
 import ManagerAttendancePage from "./pages/ManagerAttendancePage";
+import ManagerHolidayRequestsPage from "./pages/ManagerHolidayRequestsPage";
 
 function App() {
   return (
@@ -24,15 +24,7 @@ function App() {
         <Route path="/manager/employees" element={<ManagerEmployeesPage />} />
         <Route path="/manager/tasks" element={<ManagerTasksPage />} />
         <Route path="/manager/attendance" element={<ManagerAttendancePage />} />
-        <Route
-          path="/manager/holidays"
-          element={
-            <ManagerPlaceholderPage
-              title="Manager Holiday Requests Page"
-              description="This temporary page will become the holiday review area for pending, approved, and rejected leave requests."
-            />
-          }
-        />
+        <Route path="/manager/holidays" element={<ManagerHolidayRequestsPage />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
       </Routes>
     </BrowserRouter>

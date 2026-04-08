@@ -1,0 +1,154 @@
+.manager-holiday-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.manager-holiday-subtitle {
+  margin: 10px 0 0;
+  text-align: left;
+  color: #4b5563;
+}
+
+.manager-holiday-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.manager-holiday-stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.manager-holiday-stat-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.manager-holiday-stat-card strong {
+  color: #111827;
+  font-size: 1.5rem;
+}
+
+.manager-holiday-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manager-holiday-filter {
+  width: 190px;
+  margin-bottom: 0;
+}
+
+.manager-holiday-empty {
+  margin: 0;
+}
+
+.manager-holiday-log {
+  display: grid;
+  gap: 16px;
+}
+
+.manager-holiday-card {
+  margin-bottom: 0;
+}
+
+.manager-holiday-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.manager-holiday-email {
+  margin: 6px 0 0;
+  text-align: left;
+  color: #6b7280;
+}
+
+.manager-holiday-meta {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.manager-holiday-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.manager-holiday-meta-row span {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.manager-holiday-meta-row strong {
+  text-align: right;
+  color: #111827;
+}
+
+.manager-holiday-detail {
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.manager-holiday-detail span {
+  display: block;
+  margin-bottom: 6px;
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.manager-holiday-note {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+@media (max-width: 960px) {
+  .manager-holiday-header {
+    align-items: stretch;
+  }
+
+  .manager-holiday-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .manager-holiday-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-holiday-filter-wrap,
+  .manager-holiday-card-top,
+  .manager-holiday-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .manager-holiday-filter {
+    width: 100%;
+  }
+
+  .manager-holiday-meta-row strong {
+    text-align: left;
+  }
+}
