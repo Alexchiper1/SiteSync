@@ -95,6 +95,36 @@ router.get("/tasks-site/:siteId", async (req, res) => {
   res.json(tasks);
 });
 
+router.get("/manager-tasks/:managerEmail", async (req, res) => {
+  try {
+    const db = await getDb();
+    const managerEmail = String(req.params.managerEmail || "").trim().toLowerCase();
+
+    const sites = await db
+      .collection("sites")
+      .find({ managerEmail })
+      .project({ _id: 1 })
+      .toArray();
+
+    const siteIds = sites.map((site) => String(site._id));
+
+    if (siteIds.length === 0) {
+      return res.json([]);
+    }
+
+    const tasks = await db
+      .collection("tasks")
+      .find({ siteId: { $in: siteIds } })
+      .sort({ _id: -1 })
+      .toArray();
+
+    res.json(tasks);
+  } catch (err) {
+    console.error("GET /manager-tasks failed:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
+  }
+});
+
 router.put("/tasks/:taskId", async (req, res) => {
   const db = await getDb();
 

@@ -8,6 +8,7 @@ import ManagerProfilePage from "./pages/ManagerProfilePage";
 import ManagerPlaceholderPage from "./pages/ManagerPlaceholderPage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
+import ManagerTasksPage from "./pages/ManagerTasksPage";
 
 function App() {
   return (
@@ -20,15 +21,7 @@ function App() {
         <Route path="/manager/profile" element={<ManagerProfilePage />} />
         <Route path="/manager/sites" element={<ManagerSitesPage />} />
         <Route path="/manager/employees" element={<ManagerEmployeesPage />} />
-        <Route
-          path="/manager/tasks"
-          element={
-            <ManagerPlaceholderPage
-              title="Manager Tasks Page"
-              description="This temporary page will become the task assignment and tracking area with employee, site, and status views."
-            />
-          }
-        />
+        <Route path="/manager/tasks" element={<ManagerTasksPage />} />
         <Route
           path="/manager/attendance"
           element={
