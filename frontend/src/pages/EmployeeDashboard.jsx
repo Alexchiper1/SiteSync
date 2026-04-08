@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/EmployeeDashboard.css";
-import { apiUrl, profileImageUrl } from "../lib/api";
+import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 import SiteLiveMap from "../components/SiteLiveMap";
 import { haversineMeters } from "../utils/distance";
 
@@ -395,7 +395,10 @@ export default function EmployeeDashboard() {
             }}
           >
             <img
-              src={profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"}
+              src={
+                profileImageUrl(currentUser?.profileImage) ||
+                profileFallbackUrl(currentUser?.name)
+              }
               alt="Profile"
             />
           </div>

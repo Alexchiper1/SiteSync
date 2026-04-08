@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerEmployeesPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
-import { apiUrl, profileImageUrl } from "../lib/api";
+import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 
 export default function ManagerEmployeesPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -116,7 +116,7 @@ export default function ManagerEmployeesPage() {
                       <img
                         src={
                           profileImageUrl(employee.profileImage) ||
-                          "https://via.placeholder.com/72"
+                          profileFallbackUrl(employee.name)
                         }
                         alt={employee.name}
                       />

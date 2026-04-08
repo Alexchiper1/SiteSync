@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import "../css/ManagerProfilePage.css";
-import { apiUrl, profileImageUrl } from "../lib/api";
+import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 import ManagerSidebar from "../components/ManagerSidebar";
 
 export default function ManagerProfilePage() {
@@ -105,7 +105,8 @@ export default function ManagerProfilePage() {
               >
                 <img
                   src={
-                    profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"
+                    profileImageUrl(currentUser?.profileImage) ||
+                    profileFallbackUrl(currentUser?.name)
                   }
                   alt="Profile"
                 />

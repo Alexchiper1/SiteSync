@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import MapPicker from "../components/MapPicker";
-import { apiUrl, profileImageUrl, taskImageUrl } from "../lib/api";
+import { apiUrl, profileFallbackUrl, profileImageUrl, taskImageUrl } from "../lib/api";
 import ManagerSidebar from "../components/ManagerSidebar";
 
 export default function ManagerDashboard() {
@@ -306,7 +306,10 @@ export default function ManagerDashboard() {
             }}
           >
             <img
-              src={profileImageUrl(currentUser?.profileImage) || "https://via.placeholder.com/80"}
+              src={
+                profileImageUrl(currentUser?.profileImage) ||
+                profileFallbackUrl(currentUser?.name)
+              }
               alt="Profile"
             />
           </div>
