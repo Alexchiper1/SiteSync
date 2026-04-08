@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../css/ManagerDashboard.css";
 import "../css/ManagerProfilePage.css";
 import { apiUrl, profileImageUrl } from "../lib/api";
@@ -84,12 +84,6 @@ export default function ManagerProfilePage() {
 
         <main className="manager-section-main">
           <div className="manager-profile-shell">
-            <div className="manager-profile-topbar">
-              <Link to="/manager" className="manager-profile-back-link">
-                Back to dashboard
-              </Link>
-            </div>
-
             {message.text && (
               <div className={`app-message app-message-${message.type}`}>
                 {message.text}
