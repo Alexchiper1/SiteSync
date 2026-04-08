@@ -7,6 +7,7 @@ import EmployeeDashboard from "./pages/EmployeeDashboard";
 import ManagerProfilePage from "./pages/ManagerProfilePage";
 import ManagerPlaceholderPage from "./pages/ManagerPlaceholderPage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
+import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 
 function App() {
   return (
@@ -18,15 +19,7 @@ function App() {
         <Route path="/manager" element={<ManagerDashboard />} />
         <Route path="/manager/profile" element={<ManagerProfilePage />} />
         <Route path="/manager/sites" element={<ManagerSitesPage />} />
-        <Route
-          path="/manager/employees"
-          element={
-            <ManagerPlaceholderPage
-              title="Manager Employees Page"
-              description="This temporary page will become the employee oversight area for reviewing staff, assignments, and quick actions."
-            />
-          }
-        />
+        <Route path="/manager/employees" element={<ManagerEmployeesPage />} />
         <Route
           path="/manager/tasks"
           element={

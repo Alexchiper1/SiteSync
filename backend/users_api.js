@@ -4,6 +4,10 @@ import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
 
 const router = express.Router();
 
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
 function uploadProfileImage(file) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -32,6 +36,117 @@ router.get("/users", async (req, res) => {
   const db = await getDb();
   const users = await db.collection("users").find({}).toArray();
   res.json(users);
+});
+
+router.get("/manager-employees/:managerEmail", async (req, res) => {
+  try {
+    const db = await getDb();
+    const managerEmail = normalizeEmail(req.params.managerEmail);
+
+    const sites = await db
+      .collection("sites")
+      .find({ managerEmail })
+      .toArray();
+
+    const siteIds = sites.map((site) => String(site._id));
+
+    if (siteIds.length === 0) {
+      return res.json([]);
+    }
+
+    const members = await db
+      .collection("siteMembers")
+      .find({ siteId: { $in: siteIds } })
+      .toArray();
+
+    if (members.length === 0) {
+      return res.json([]);
+    }
+
+    const employeeEmails = [...new Set(members.map((member) => normalizeEmail(member.employeeEmail)))];
+
+    const [users, todaysAttendance, tasks] = await Promise.all([
+      db
+        .collection("users")
+        .find({ email: { $in: employeeEmails } })
+        .toArray(),
+      (() => {
+        const start = new Date();
+        start.setUTCHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setUTCDate(end.getUTCDate() + 1);
+
+        return db
+          .collection("attendance")
+          .find({
+            managerEmail,
+            employeeEmail: { $in: employeeEmails },
+            checkInAt: { $gte: start, $lt: end }
+          })
+          .toArray();
+      })(),
+      db
+        .collection("tasks")
+        .find({ employeeEmail: { $in: employeeEmails } })
+        .toArray()
+    ]);
+
+    const userMap = new Map(users.map((user) => [normalizeEmail(user.email), user]));
+    const membershipMap = new Map();
+    const statusMap = new Map();
+    const taskCountMap = new Map();
+
+    members.forEach((member) => {
+      const email = normalizeEmail(member.employeeEmail);
+      const existing = membershipMap.get(email) || [];
+      if (!existing.some((item) => item.siteId === member.siteId)) {
+        existing.push({
+          siteId: member.siteId,
+          siteName: member.siteName || "Unknown site"
+        });
+      }
+      membershipMap.set(email, existing);
+    });
+
+    todaysAttendance.forEach((row) => {
+      const email = normalizeEmail(row.employeeEmail);
+      const nextStatus = row.checkOutAt ? "checked out" : "checked in";
+      const currentStatus = statusMap.get(email);
+
+      if (currentStatus !== "checked in") {
+        statusMap.set(email, nextStatus);
+      }
+    });
+
+    tasks.forEach((task) => {
+      const email = normalizeEmail(task.employeeEmail);
+      taskCountMap.set(email, (taskCountMap.get(email) || 0) + 1);
+    });
+
+    const employees = employeeEmails.map((email) => {
+      const user = userMap.get(email);
+      const joinedSites = membershipMap.get(email) || [];
+      const primarySite = joinedSites[0];
+
+      return {
+        email,
+        name: user?.name || email,
+        role: user?.role || "employee",
+        companyName: user?.companyName || "",
+        profileImage: user?.profileImage || "",
+        assignedSite: primarySite?.siteName || "Unassigned",
+        assignedSiteId: primarySite?.siteId || "",
+        joinedSites,
+        status: statusMap.get(email) || "assigned",
+        taskCount: taskCountMap.get(email) || 0
+      };
+    });
+
+    res.json(employees);
+  } catch (err) {
+    console.error("GET /manager-employees failed:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
+  }
 });
 
 router.post("/users", async (req, res) => {
