@@ -156,6 +156,11 @@
   .manager-section-layout {
     flex-direction: column;
   }
+
+  .manager-section-page .manager-section-main {
+    width: 100%;
+    padding-top: 76px;
+  }
 }
 
 @media (max-width: 420px) {
