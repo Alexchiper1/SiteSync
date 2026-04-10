@@ -1,0 +1,114 @@
+.employee-attendance-subtitle {
+  margin: 10px 0 0;
+  text-align: left;
+  color: #4b5563;
+}
+
+.employee-attendance-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.employee-attendance-status-card,
+.employee-attendance-record-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.employee-attendance-status-card span,
+.employee-attendance-feedback-row span {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.employee-attendance-map-wrap {
+  margin-top: 18px;
+}
+
+.employee-attendance-feedback {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.employee-attendance-feedback-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.employee-attendance-feedback-row strong {
+  color: #111827;
+  text-align: right;
+}
+
+.employee-attendance-warning {
+  margin-top: 14px;
+  text-align: left;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.employee-attendance-empty {
+  margin: 0;
+}
+
+.employee-attendance-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.employee-attendance-date-range {
+  display: flex;
+  gap: 10px;
+}
+
+.employee-attendance-date-range input {
+  margin-bottom: 0;
+}
+
+.employee-attendance-history-grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .employee-attendance-status-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-attendance-history-header,
+  .employee-attendance-feedback-row,
+  .employee-attendance-date-range {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .employee-attendance-feedback-row strong {
+    text-align: left;
+  }
+
+  .employee-attendance-date-range {
+    width: 100%;
+  }
+
+  .employee-attendance-date-range input {
+    width: 100%;
+  }
+}

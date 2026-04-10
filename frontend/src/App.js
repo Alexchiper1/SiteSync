@@ -14,6 +14,7 @@ import EmployeeProfilePage from "./pages/EmployeeProfilePage";
 import EmployeePlaceholderPage from "./pages/EmployeePlaceholderPage";
 import EmployeeSitesPage from "./pages/EmployeeSitesPage";
 import EmployeeTasksPage from "./pages/EmployeeTasksPage";
+import EmployeeAttendancePage from "./pages/EmployeeAttendancePage";
 
 function App() {
   return (
@@ -33,15 +34,7 @@ function App() {
         <Route path="/employee/profile" element={<EmployeeProfilePage />} />
         <Route path="/employee/sites" element={<EmployeeSitesPage />} />
         <Route path="/employee/tasks" element={<EmployeeTasksPage />} />
-        <Route
-          path="/employee/attendance"
-          element={
-            <EmployeePlaceholderPage
-              title="Employee Attendance Page"
-              description="This temporary page will become the attendance area for check-ins, check-outs, and geolocation status."
-            />
-          }
-        />
+        <Route path="/employee/attendance" element={<EmployeeAttendancePage />} />
         <Route
           path="/employee/holidays"
           element={
