@@ -1,0 +1,156 @@
+.employee-overview-page {
+  background: #f5f7fa;
+}
+
+.employee-overview-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.employee-overview-profile-card {
+  position: sticky;
+  top: 24px;
+}
+
+.employee-overview-header p {
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.employee-overview-subtitle {
+  color: #4b5563;
+}
+
+.employee-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.employee-overview-stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.employee-overview-stat-card span,
+.employee-overview-feedback-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.employee-overview-stat-card strong,
+.employee-overview-feedback-card strong {
+  color: #111827;
+}
+
+.employee-overview-stat-card p,
+.employee-overview-activity-item p {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.employee-overview-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.employee-overview-action-grid button {
+  margin-top: 0;
+}
+
+.employee-overview-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 20px;
+}
+
+.employee-overview-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.employee-overview-section-header h2 {
+  margin: 0;
+}
+
+.employee-overview-site-select {
+  width: 220px;
+  margin-bottom: 0;
+}
+
+.employee-overview-feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.employee-overview-feedback-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.employee-overview-map-wrap {
+  margin-top: 18px;
+}
+
+.employee-overview-activity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.employee-overview-activity-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.employee-overview-empty {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .employee-overview-grid,
+  .employee-overview-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .employee-overview-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .employee-overview-profile-card {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-overview-grid,
+  .employee-overview-action-grid,
+  .employee-overview-feedback-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-overview-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .employee-overview-site-select {
+    width: 100%;
+  }
+}

@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ManagerDashboard from "./pages/ManagerDashboard";
-import EmployeeDashboard from "./pages/EmployeeDashboard";
+import EmployeeOverviewPage from "./pages/EmployeeOverviewPage";
 import ManagerProfilePage from "./pages/ManagerProfilePage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
@@ -30,7 +30,7 @@ function App() {
         <Route path="/manager/tasks" element={<ManagerTasksPage />} />
         <Route path="/manager/attendance" element={<ManagerAttendancePage />} />
         <Route path="/manager/holidays" element={<ManagerHolidayRequestsPage />} />
-        <Route path="/employee" element={<EmployeeDashboard />} />
+        <Route path="/employee" element={<EmployeeOverviewPage />} />
         <Route path="/employee/profile" element={<EmployeeProfilePage />} />
         <Route path="/employee/sites" element={<EmployeeSitesPage />} />
         <Route path="/employee/tasks" element={<EmployeeTasksPage />} />
