@@ -11,10 +11,10 @@ import ManagerTasksPage from "./pages/ManagerTasksPage";
 import ManagerAttendancePage from "./pages/ManagerAttendancePage";
 import ManagerHolidayRequestsPage from "./pages/ManagerHolidayRequestsPage";
 import EmployeeProfilePage from "./pages/EmployeeProfilePage";
-import EmployeePlaceholderPage from "./pages/EmployeePlaceholderPage";
 import EmployeeSitesPage from "./pages/EmployeeSitesPage";
 import EmployeeTasksPage from "./pages/EmployeeTasksPage";
 import EmployeeAttendancePage from "./pages/EmployeeAttendancePage";
+import EmployeeHolidaysPage from "./pages/EmployeeHolidaysPage";
 
 function App() {
   return (
@@ -35,15 +35,7 @@ function App() {
         <Route path="/employee/sites" element={<EmployeeSitesPage />} />
         <Route path="/employee/tasks" element={<EmployeeTasksPage />} />
         <Route path="/employee/attendance" element={<EmployeeAttendancePage />} />
-        <Route
-          path="/employee/holidays"
-          element={
-            <EmployeePlaceholderPage
-              title="Employee Holiday Page"
-              description="This temporary page will become the holiday request area for new requests and request history."
-            />
-          }
-        />
+        <Route path="/employee/holidays" element={<EmployeeHolidaysPage />} />
       </Routes>
     </BrowserRouter>
   );

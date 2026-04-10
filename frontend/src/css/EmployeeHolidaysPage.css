@@ -1,0 +1,112 @@
+.employee-holidays-subtitle {
+  margin: 10px 0 0;
+  text-align: left;
+  color: #4b5563;
+}
+
+.employee-holiday-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.employee-holiday-stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.employee-holiday-stat-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.employee-holiday-stat-card strong {
+  color: #111827;
+  font-size: 1.5rem;
+}
+
+.employee-holiday-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.employee-holiday-filter {
+  width: 190px;
+  margin-bottom: 0;
+}
+
+.employee-holidays-empty {
+  margin: 0;
+}
+
+.employee-holiday-list {
+  display: grid;
+  gap: 16px;
+}
+
+.employee-holiday-card {
+  margin: 0;
+}
+
+.employee-holiday-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.employee-holiday-date-text {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.employee-holiday-detail-box {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.employee-holiday-detail-box span {
+  display: block;
+  margin-bottom: 6px;
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.employee-holiday-note-box {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+@media (max-width: 960px) {
+  .employee-holiday-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-holiday-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-holiday-history-header,
+  .employee-holiday-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .employee-holiday-filter {
+    width: 100%;
+  }
+}
