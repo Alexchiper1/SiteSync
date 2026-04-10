@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/EmployeeDashboard.css";
+import "../css/EmployeeOverviewPage.css";
 import "../css/EmployeeProfilePage.css";
 import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 import EmployeeSidebar from "../components/EmployeeSidebar";

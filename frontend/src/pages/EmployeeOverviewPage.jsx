@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/EmployeeDashboard.css";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeOverviewPage.css";
 import EmployeeSidebar from "../components/EmployeeSidebar";

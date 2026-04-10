@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import "../css/EmployeeDashboard.css";
+import "../css/EmployeeOverviewPage.css";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeHolidaysPage.css";
 import EmployeeSidebar from "../components/EmployeeSidebar";

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/ManagerDashboard.css";
+import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
 import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
 import ManagerSidebar from "../components/ManagerSidebar";

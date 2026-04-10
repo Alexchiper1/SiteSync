@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import "../css/ManagerDashboard.css";
+import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerHolidayRequestsPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";

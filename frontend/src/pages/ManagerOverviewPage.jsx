@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/ManagerDashboard.css";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerOverviewPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";

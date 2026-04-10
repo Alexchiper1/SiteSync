@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import "../css/ManagerDashboard.css";
+import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerTasksPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
