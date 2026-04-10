@@ -1,96 +1,128 @@
 # SiteSync
 
-
-SiteSync is a construction site check-in and management platform where managers can register companies, create job sites, and track employee check-ins via geolocation.
-
-Employees can:
-- Check in/out automatically within 100m of a job site
-- Receive assigned tasks
-- Upload photos of completed work
-- Mark tasks as “Unable to complete” with reasons
-- Request holidays or time off
+SiteSync is a construction site attendance and workforce management app for managers and employees.
 
 Managers can:
-- View live check-in data
-- Assign and review employee tasks
-- Approve/deny leave requests
+- Create and manage sites
+- Review employee attendance
+- Assign and track tasks
+- Approve or reject holiday requests
+- View overview dashboards and profile details
 
----
+Employees can:
+- Join assigned sites
+- Check in and out using geolocation and site radius checks
+- View and complete tasks with photo uploads
+- Mark tasks as unable with a reason
+- Request holidays
+- Manage their profile and profile picture
 
-## 🧠 Tech Stack
-- **Frontend:** React + Tailwind CSS
-- **Backend:** Node.js + Express
-- **Database:** MongoDB or MySQL
-- **Mobile (Phase 2):** React Native
-- **Version Control:** GitHub
+## Tech Stack
+- Frontend: React, React Router, React Leaflet, plain CSS
+- Backend: Node.js, Express
+- Database: MongoDB
+- Media uploads: Cloudinary
+- Deployment: Vercel
 
----
+## Project Structure
+- `frontend/` React client app
+- `backend/` Express app, route modules, DB connection, upload handling
+- `api/[[...path]].js` Vercel serverless entrypoint that forwards to the backend app
+- `vercel.json` frontend build output and SPA/API routing config
 
-## 🧩 Folder Overview
-| Folder | Purpose |
-|---------|----------|
-| `frontend/` | Website UI and components |
-| `backend/` | Node.js API, controllers, and DB logic |
-| `database/` | Database schema and diagrams |
-| `design/` | Figma designs, color palette, and mockups |
-| `docs/` | Reports, architecture, notes |
-| `mobile/` | Future React Native app |
+## Local Setup
 
----
+Install dependencies from the repo root:
 
-## How to Run
-
-### Local setup
 ```bash
-cd backend
 npm install
-
-cd ../frontend
-npm install
-
-cd ..
-npm install
+npm --prefix frontend install
+npm --prefix backend install
 ```
 
-### Start frontend and backend together
+Create `backend/.env` with your local environment variables:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+FRONTEND_URL=http://localhost:3000
+PORT=5000
+
+# Optional locally, but recommended if you want image uploads
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+## Running Locally
+
+Run frontend and backend together from the repo root:
+
 ```bash
-cd C:\SiteSync
 npm run dev:full
 ```
 
-The frontend runs on `http://localhost:3000` and the backend runs on `http://localhost:5000`.
+Other available root scripts:
 
-### Backend environment variables
+```bash
+npm run dev:frontend
+npm run dev:backend
+```
 
-Create `backend/.env` from `backend/.env.example`.
+Default local URLs:
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:5000`
+
+## Environment Variables
+
+Backend reads variables from `backend/.env`.
 
 Required:
 - `MONGO_URI`
+
+Recommended:
+- `FRONTEND_URL`
+
+Needed for image uploads on Vercel, and recommended locally if you want cloud uploads:
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
 
 Optional:
 - `PORT`
-- `FRONTEND_URL`
 
-## Vercel Deployment
+Frontend:
+- `REACT_APP_API_BASE` is optional. If omitted, the app uses `http://localhost:5000` on localhost and `/api` in production.
 
-This repo is configured so Vercel serves the React frontend from `frontend/` and the API from `api/index.js`.
+## Deployment
 
-### Required Vercel environment variables
+This repo is configured for Vercel:
+- The frontend is built from `frontend/`
+- The output directory is `frontend/build`
+- API requests are handled by `api/[[...path]].js`
+- Client-side routes are rewritten to `index.html` by `vercel.json`
+
+### Vercel Environment Variables
+
+Set these in Vercel:
 - `MONGO_URI`
+- `FRONTEND_URL`
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
-- `FRONTEND_URL`
 
 Recommended production value:
-```bash
+
+```env
 FRONTEND_URL=https://your-vercel-project.vercel.app
 ```
 
-### Deployment notes
-- Frontend API calls switch to same-origin `/api` automatically in production.
-- Task photos upload to Cloudinary in production when the Cloudinary env vars are set.
-- React Router refreshes on routes like `/manager` and `/employee` are handled by `vercel.json`.
+## Upload Behavior
+
+- On localhost, uploads can fall back to local disk storage if Cloudinary is not configured.
+- On Vercel, the filesystem is read-only, so uploads should use Cloudinary.
+
+## Notes
+
+- The frontend automatically uses same-origin `/api` in production.
+- Attendance features depend on browser geolocation access.
+- React Router refreshes on routes like `/manager/*` and `/employee/*` are handled by `vercel.json`.
