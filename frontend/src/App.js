@@ -13,6 +13,7 @@ import ManagerHolidayRequestsPage from "./pages/ManagerHolidayRequestsPage";
 import EmployeeProfilePage from "./pages/EmployeeProfilePage";
 import EmployeePlaceholderPage from "./pages/EmployeePlaceholderPage";
 import EmployeeSitesPage from "./pages/EmployeeSitesPage";
+import EmployeeTasksPage from "./pages/EmployeeTasksPage";
 
 function App() {
   return (
@@ -31,15 +32,7 @@ function App() {
         <Route path="/employee" element={<EmployeeDashboard />} />
         <Route path="/employee/profile" element={<EmployeeProfilePage />} />
         <Route path="/employee/sites" element={<EmployeeSitesPage />} />
-        <Route
-          path="/employee/tasks"
-          element={
-            <EmployeePlaceholderPage
-              title="Employee Tasks Page"
-              description="This temporary page will become the task area for task tracking, uploads, and status updates."
-            />
-          }
-        />
+        <Route path="/employee/tasks" element={<EmployeeTasksPage />} />
         <Route
           path="/employee/attendance"
           element={
