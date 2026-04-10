@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ManagerDashboard from "./pages/ManagerDashboard";
+import ManagerOverviewPage from "./pages/ManagerOverviewPage";
 import EmployeeOverviewPage from "./pages/EmployeeOverviewPage";
 import ManagerProfilePage from "./pages/ManagerProfilePage";
 import ManagerSitesPage from "./pages/ManagerSitesPage";
@@ -23,7 +23,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/manager" element={<ManagerDashboard />} />
+        <Route path="/manager" element={<ManagerOverviewPage />} />
         <Route path="/manager/profile" element={<ManagerProfilePage />} />
         <Route path="/manager/sites" element={<ManagerSitesPage />} />
         <Route path="/manager/employees" element={<ManagerEmployeesPage />} />

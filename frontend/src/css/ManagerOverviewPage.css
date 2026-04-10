@@ -1,0 +1,129 @@
+.manager-overview-page {
+  background: #f5f7fa;
+}
+
+.manager-overview-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.manager-overview-profile-card {
+  position: sticky;
+  top: 24px;
+}
+
+.manager-overview-header p {
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.manager-overview-subtitle {
+  color: #4b5563;
+}
+
+.manager-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.manager-overview-stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.manager-overview-stat-card span,
+.manager-overview-feedback-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.manager-overview-stat-card strong,
+.manager-overview-feedback-card strong {
+  color: #111827;
+}
+
+.manager-overview-stat-card p,
+.manager-overview-activity-item p {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.manager-overview-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.manager-overview-action-grid button {
+  margin-top: 0;
+}
+
+.manager-overview-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 20px;
+}
+
+.manager-overview-feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.manager-overview-feedback-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.manager-overview-activity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.manager-overview-activity-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.manager-overview-empty {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .manager-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .manager-overview-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .manager-overview-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .manager-overview-profile-card {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .manager-overview-grid,
+  .manager-overview-action-grid,
+  .manager-overview-feedback-grid {
+    grid-template-columns: 1fr;
+  }
+}
