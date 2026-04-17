@@ -8,6 +8,20 @@ function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+function isValidEmail(email) {
+  const value = normalizeEmail(email);
+
+  if (value.length < 5 || value.length > 254) {
+    return false;
+  }
+
+  if (/\s/.test(value) || value.includes("..")) {
+    return false;
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
 function uploadProfileImage(file) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -159,9 +173,13 @@ router.post("/users", async (req, res) => {
       return res.status(400).json({ msg: "Password must be a minimum of 6 characters." });
     }
 
-    const db = await getDb();
+    const email = normalizeEmail(req.body.email);
 
-    const email = req.body.email.trim().toLowerCase();
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ msg: "Please enter a valid email address" });
+    }
+
+    const db = await getDb();
 
     // check if email already exists
     const existingUser = await db.collection("users").findOne({ email });

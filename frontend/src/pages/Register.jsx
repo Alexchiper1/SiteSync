@@ -4,6 +4,20 @@ import logo from "../pictures/LogoNoBack.png";
 import "../css/Register.css";
 import { apiUrl } from "../lib/api";
 
+function isValidEmail(email) {
+  const value = String(email || "").trim().toLowerCase();
+
+  if (value.length < 5 || value.length > 254) {
+    return false;
+  }
+
+  if (/\s/.test(value) || value.includes("..")) {
+    return false;
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
 export default function Register() {
   const [role, setRole] = useState("employee");
   const [form, setForm] = useState({});
@@ -21,9 +35,19 @@ export default function Register() {
       return;
     }
 
+    const email = String(form.email || "").trim().toLowerCase();
+
+    if (!isValidEmail(email)) {
+      setMessage({
+        text: "Please enter a valid email address",
+        type: "error"
+      });
+      return;
+    }
+
     const newUser = {
       name: form.name?.trim(),
-      email: form.email?.trim().toLowerCase(),
+      email,
       password: form.password, 
       role,
       ...(role === "manager" && { companyName: form.companyName?.trim() })
@@ -104,6 +128,11 @@ export default function Register() {
             onChange={e => setForm({ ...form, email: e.target.value })}
             required
           />
+
+          {(form.email || "").trim().length > 0 &&
+            !isValidEmail(form.email) && (
+              <div className="field-error-message">Enter a valid email address</div>
+            )}
 
           <input
             type="password"
