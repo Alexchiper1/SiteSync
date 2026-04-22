@@ -5,18 +5,11 @@ import "../css/Login.css";
 import { apiUrl } from "../lib/api";
 
 export default function Login() {
-  const [users, setUsers] = useState([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "info" });
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch(apiUrl("/users"))
-      .then(res => res.json())
-      .then(data => setUsers(data));
-  }, []);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -25,19 +18,34 @@ export default function Login() {
     }
   }, [location.pathname, location.state, navigate]);
 
-  const handleLogin = () => {
-    const user = users.find(
-      u => u.email === email && u.password === password
-    );
+  const handleLogin = async () => {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedPassword = String(password || "");
 
-    if (!user) {
+    if (!normalizedEmail || !normalizedPassword) {
+      setMessage({ text: "Please enter both email and password", type: "error" });
+      return;
+    }
+
+    const res = await fetch(apiUrl("/login"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: normalizedEmail,
+        password: normalizedPassword
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
       setMessage({ text: "Invalid email or password", type: "error" });
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(data));
 
-    if (user.role === "manager") navigate("/manager");
+    if (data.role === "manager") navigate("/manager");
     else navigate("/employee");
   };
 
