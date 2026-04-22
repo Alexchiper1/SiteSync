@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../css/ManagerSidebar.css";
 
 const navItems = [
@@ -14,6 +14,14 @@ const navItems = [
 
 export default function ManagerSidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    sessionStorage.clear();
+    setIsMobileOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -80,6 +88,13 @@ export default function ManagerSidebar() {
                 {item.label}
               </NavLink>
             ))}
+            <button
+              type="button"
+              className="manager-sidebar-logout"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
           </nav>
         </div>
       </aside>

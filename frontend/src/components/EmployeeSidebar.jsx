@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../css/EmployeeSidebar.css";
 
 const navItems = [
@@ -13,6 +13,14 @@ const navItems = [
 
 export default function EmployeeSidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    sessionStorage.clear();
+    setIsMobileOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -78,6 +86,13 @@ export default function EmployeeSidebar() {
                 {item.label}
               </NavLink>
             ))}
+            <button
+              type="button"
+              className="employee-sidebar-logout"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
           </nav>
         </div>
       </aside>
