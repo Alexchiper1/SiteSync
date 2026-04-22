@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcryptjs";
 import { getDb } from "./db.js";
 import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
 
@@ -20,6 +21,10 @@ function isValidEmail(email) {
   }
 
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function isBcryptHash(value) {
+  return /^\$2[aby]\$\d{2}\$/.test(String(value || ""));
 }
 
 function uploadProfileImage(file) {
@@ -48,7 +53,7 @@ function uploadProfileImage(file) {
 
 router.get("/users", async (req, res) => {
   const db = await getDb();
-  const users = await db.collection("users").find({}).toArray();
+  const users = await db.collection("users").find({}, { projection: { password: 0 } }).toArray();
   res.json(users);
 });
 
@@ -188,10 +193,12 @@ router.post("/users", async (req, res) => {
       return res.status(400).json({ msg: "Email already exists" });
     }
 
+    const hashedPassword = await bcrypt.hash(String(req.body.password), 12);
+
     await db.collection("users").insertOne({
       name: req.body.name,
       email,
-      password: req.body.password,
+      password: hashedPassword,
       role: req.body.role,
       companyName: req.body.companyName || ""
     });
@@ -207,14 +214,37 @@ router.post("/login", async (req, res) => {
   try {
     const db = await getDb();
 
-    const email = req.body.email.trim().toLowerCase();
+    const email = normalizeEmail(req.body.email);
+    const inputPassword = String(req.body.password || "");
     const user = await db.collection("users").findOne({ email });
 
-    if (!user || user.password !== req.body.password) {
+    if (!user) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    res.json(user);
+    let isValidPassword = false;
+    const storedPassword = String(user.password || "");
+
+    if (isBcryptHash(storedPassword)) {
+      isValidPassword = await bcrypt.compare(inputPassword, storedPassword);
+    } else {
+      // Backward-compatible: allow old plaintext account once, then upgrade to hash.
+      isValidPassword = storedPassword === inputPassword;
+      if (isValidPassword) {
+        const upgradedHash = await bcrypt.hash(inputPassword, 12);
+        await db.collection("users").updateOne(
+          { _id: user._id },
+          { $set: { password: upgradedHash } }
+        );
+      }
+    }
+
+    if (!isValidPassword) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    const { password, ...safeUser } = user;
+    res.json(safeUser);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }
