@@ -1,6 +1,9 @@
 .manager-sidebar-nav {
   width: 260px;
   flex-shrink: 0;
+  position: sticky;
+  top: 24px;
+  align-self: flex-start;
 }
 
 .manager-sidebar-mobile-toggle {
@@ -12,8 +15,7 @@
 }
 
 .manager-sidebar-card {
-  position: sticky;
-  top: 24px;
+  position: relative;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
