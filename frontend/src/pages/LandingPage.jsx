@@ -2,6 +2,10 @@ import { Link } from "react-router-dom";
 import logo from "../pictures/LogoNoBack.png";
 import "../css/LandingPage.css";
 
+const LANDING_VIDEO_EMBED_URL =
+  process.env.REACT_APP_LANDING_VIDEO_EMBED_URL?.trim() ||
+  "https://player.cloudinary.com/embed/?cloud_name=djd5nuajp&public_id=0422_oj7fcf";
+
 const featureCards = [
   {
     title: "Who Can Use It",
@@ -43,12 +47,20 @@ export default function LandingPage() {
       <main className="landing-content">
         <section className="landing-hero">
           <div className="landing-video-panel">
-            <div className="landing-video-placeholder">
-              <span className="landing-video-badge">Video coming soon</span>
-              <h2>See SiteSync in action</h2>
-              <p>
-                A quick walkthrough video will be added here to show how teams
-                can manage sites, tasks, and attendance from one place.
+            <div className="landing-video-shell">
+              <span className="landing-video-badge">Walkthrough</span>
+              <h2 className="landing-video-heading">See SiteSync in action</h2>
+              <div className="landing-video-frame">
+                <iframe
+                  src={LANDING_VIDEO_EMBED_URL}
+                  title="SiteSync walkthrough"
+                  className="landing-video-iframe"
+                  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <p className="landing-video-caption">
+                How teams manage sites, tasks, and attendance in one place.
               </p>
             </div>
           </div>
