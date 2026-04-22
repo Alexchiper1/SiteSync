@@ -139,6 +139,36 @@
   border-radius: 12px;
 }
 
+.manager-task-pagination {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.manager-task-pagination-info {
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.manager-task-pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manager-task-pagination-controls .compact-action-btn {
+  width: auto;
+  min-width: 110px;
+  margin: 0;
+}
+
+.manager-task-pagination-page {
+  color: #374151;
+  font-weight: 600;
+}
+
 @media (max-width: 960px) {
   .manager-task-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -157,6 +187,20 @@
 @media (max-width: 640px) {
   .manager-task-stats {
     grid-template-columns: 1fr;
+  }
+
+  .manager-task-pagination,
+  .manager-task-pagination-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .manager-task-pagination-controls .compact-action-btn {
+    width: 100%;
+  }
+
+  .manager-task-pagination-page {
+    text-align: center;
   }
 
   .manager-task-card-top {

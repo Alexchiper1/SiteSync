@@ -6,6 +6,8 @@ import "../css/ManagerTasksPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
 import { apiUrl, taskImageUrl } from "../lib/api";
 
+const TASKS_PER_PAGE = 8;
+
 function RefreshIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="site-icon-svg">
@@ -35,6 +37,7 @@ export default function ManagerTasksPage() {
     status: "all",
     search: ""
   });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadTaskData = useCallback(async () => {
     const [sitesRes, employeesRes, tasksRes] = await Promise.all([
@@ -106,6 +109,23 @@ export default function ManagerTasksPage() {
       return matchesEmployee && matchesSite && matchesStatus && matchesSearch;
     });
   }, [filters, tasks]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTasks.length / TASKS_PER_PAGE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters.employee, filters.search, filters.site, filters.status]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedTasks = useMemo(() => {
+    const start = (currentPage - 1) * TASKS_PER_PAGE;
+    return filteredTasks.slice(start, start + TASKS_PER_PAGE);
+  }, [currentPage, filteredTasks]);
 
   const taskCounts = useMemo(() => {
     return tasks.reduce(
@@ -351,7 +371,7 @@ export default function ManagerTasksPage() {
               </div>
             ) : (
               <div className="manager-task-log-grid">
-                {filteredTasks.map((task) => (
+                {paginatedTasks.map((task) => (
                   <article key={task._id} className="task-item manager-task-card">
                     <div className="manager-task-card-top">
                       <div>
@@ -380,6 +400,37 @@ export default function ManagerTasksPage() {
                     )}
                   </article>
                 ))}
+              </div>
+            )}
+
+            {filteredTasks.length > 0 && (
+              <div className="manager-task-pagination">
+                <span className="manager-task-pagination-info">
+                  Showing {(currentPage - 1) * TASKS_PER_PAGE + 1}-
+                  {Math.min(currentPage * TASKS_PER_PAGE, filteredTasks.length)} of{" "}
+                  {filteredTasks.length}
+                </span>
+                <div className="manager-task-pagination-controls">
+                  <button
+                    type="button"
+                    className="cancel-action-btn compact-action-btn"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <span className="manager-task-pagination-page">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    className="compact-action-btn"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </section>
