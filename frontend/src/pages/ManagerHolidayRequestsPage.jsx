@@ -5,6 +5,8 @@ import "../css/ManagerHolidayRequestsPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
 import { apiUrl } from "../lib/api";
 
+const REQUESTS_PER_PAGE = 8;
+
 function RefreshIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="site-icon-svg">
@@ -22,6 +24,7 @@ export default function ManagerHolidayRequestsPage() {
   const [requestNotes, setRequestNotes] = useState({});
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadHolidayRequests = useCallback(async () => {
     const res = await fetch(apiUrl(`/holiday-requests/manager/${currentUser.email}`));
@@ -46,6 +49,23 @@ export default function ManagerHolidayRequestsPage() {
 
     return holidayRequests.filter((request) => request.status === statusFilter);
   }, [holidayRequests, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedRequests = useMemo(() => {
+    const start = (currentPage - 1) * REQUESTS_PER_PAGE;
+    return filteredRequests.slice(start, start + REQUESTS_PER_PAGE);
+  }, [currentPage, filteredRequests]);
 
   const counts = useMemo(() => {
     return holidayRequests.reduce(
@@ -162,7 +182,7 @@ export default function ManagerHolidayRequestsPage() {
               </div>
             ) : (
               <div className="task-log manager-holiday-log">
-                {filteredRequests.map((request) => (
+                {paginatedRequests.map((request) => (
                   <div key={request._id} className="task-item manager-holiday-card">
                     <div className="manager-holiday-card-top">
                       <div>
@@ -230,6 +250,37 @@ export default function ManagerHolidayRequestsPage() {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+
+            {filteredRequests.length > 0 && (
+              <div className="manager-holiday-pagination">
+                <span className="manager-holiday-pagination-info">
+                  Showing {(currentPage - 1) * REQUESTS_PER_PAGE + 1}-
+                  {Math.min(currentPage * REQUESTS_PER_PAGE, filteredRequests.length)} of{" "}
+                  {filteredRequests.length}
+                </span>
+                <div className="manager-holiday-pagination-controls">
+                  <button
+                    type="button"
+                    className="cancel-action-btn compact-action-btn"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <span className="manager-holiday-pagination-page">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    className="compact-action-btn"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </section>
