@@ -1,0 +1,32 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+}
+
+.app-footer {
+  margin-top: 20px;
+  padding: 16px 20px 20px;
+  text-align: center;
+  border-top: 1px solid #dbe4ea;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.app-footer-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #0f766e;
+}
+
+.app-footer-line {
+  margin: 2px 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
