@@ -227,24 +227,45 @@ export default function ManagerSitesPage() {
           ) : (
             sites.map((siteItem) => (
               <div key={siteItem._id} className="site-card">
-                <button
-                  className="site-icon-button delete-site-icon"
-                  type="button"
-                  aria-label={`Delete ${siteItem.name}`}
-                  title="Delete site"
-                  onClick={() => setDeleteSiteId(siteItem._id)}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className="site-icon-svg"
+                <div className="site-card-actions">
+                  <button
+                    className="site-icon-button edit-site-icon"
+                    type="button"
+                    aria-label={`Edit ${siteItem.name}`}
+                    title="Edit site"
+                    onClick={() => startEditSite(siteItem)}
                   >
-                    <path
-                      d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 12c-1.1 0-2-.9-2-2V8h12v11c0 1.1-.9 2-2 2H8z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="site-icon-svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L18.37 9.38l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l9.62-9.62.92.92L5.92 19.58zM20.71 7.04a1 1 0 000-1.41L18.37 3.3a1 1 0 00-1.41 0l-1.29 1.29 3.75 3.75 1.29-1.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+
+                  <button
+                    className="site-icon-button delete-site-icon"
+                    type="button"
+                    aria-label={`Delete ${siteItem.name}`}
+                    title="Delete site"
+                    onClick={() => setDeleteSiteId(siteItem._id)}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="site-icon-svg"
+                    >
+                      <path
+                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 12c-1.1 0-2-.9-2-2V8h12v11c0 1.1-.9 2-2 2H8z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
 
                 <strong>{siteItem.name}</strong>
                 <p>{siteItem.location}</p>
@@ -268,13 +289,6 @@ export default function ManagerSitesPage() {
                   </div>
                 </div>
 
-                <button
-                  className="edit-site-btn"
-                  type="button"
-                  onClick={() => startEditSite(siteItem)}
-                >
-                  Edit Site
-                </button>
               </div>
             ))
           )}
