@@ -6,6 +6,10 @@ import ManagerSidebar from "../components/ManagerSidebar";
 import { apiUrl } from "../lib/api";
 
 const REQUESTS_PER_PAGE = 8;
+const STATUS_ALL = "all";
+const STATUS_PENDING = "pending";
+const STATUS_APPROVED = "approved";
+const STATUS_DENIED = "denied";
 
 function RefreshIcon() {
   return (
@@ -19,11 +23,12 @@ function RefreshIcon() {
 }
 
 export default function ManagerHolidayRequestsPage() {
+  // Logged-in manager used for manager-scoped API requests.
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [requestNotes, setRequestNotes] = useState({});
   const [message, setMessage] = useState({ text: "", type: "info" });
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(STATUS_ALL);
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadHolidayRequests = useCallback(async () => {
@@ -43,7 +48,8 @@ export default function ManagerHolidayRequestsPage() {
   }, [loadHolidayRequests]);
 
   const filteredRequests = useMemo(() => {
-    if (statusFilter === "all") {
+    // Keep all rows when no status filter is selected.
+    if (statusFilter === STATUS_ALL) {
       return holidayRequests;
     }
 
@@ -63,11 +69,13 @@ export default function ManagerHolidayRequestsPage() {
   }, [currentPage, totalPages]);
 
   const paginatedRequests = useMemo(() => {
+    // Render only the current page slice to keep the list manageable.
     const start = (currentPage - 1) * REQUESTS_PER_PAGE;
     return filteredRequests.slice(start, start + REQUESTS_PER_PAGE);
   }, [currentPage, filteredRequests]);
 
   const counts = useMemo(() => {
+    // Compute status totals for the summary cards.
     return holidayRequests.reduce(
       (acc, request) => {
         acc.total += 1;
@@ -97,6 +105,16 @@ export default function ManagerHolidayRequestsPage() {
       setRequestNotes((prev) => ({ ...prev, [requestId]: "" }));
     }
   };
+
+  const handleRequestNoteChange = (requestId, value) => {
+    setRequestNotes((prev) => ({
+      ...prev,
+      [requestId]: value
+    }));
+  };
+
+  const startItem = (currentPage - 1) * REQUESTS_PER_PAGE + 1;
+  const endItem = Math.min(currentPage * REQUESTS_PER_PAGE, filteredRequests.length);
 
   return (
     <div className="manager-section-page">
@@ -157,10 +175,10 @@ export default function ManagerHolidayRequestsPage() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="manager-holiday-filter"
                 >
-                  <option value="all">All requests</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="denied">Rejected</option>
+                  <option value={STATUS_ALL}>All requests</option>
+                  <option value={STATUS_PENDING}>Pending</option>
+                  <option value={STATUS_APPROVED}>Approved</option>
+                  <option value={STATUS_DENIED}>Rejected</option>
                 </select>
                 <button
                   type="button"
@@ -221,27 +239,22 @@ export default function ManagerHolidayRequestsPage() {
                       </div>
                     )}
 
-                    {request.status === "pending" && (
+                    {request.status === STATUS_PENDING && (
                       <>
                         <input
                           type="text"
                           placeholder="Optional note"
                           value={requestNotes[request._id] || ""}
-                          onChange={(e) =>
-                            setRequestNotes((prev) => ({
-                              ...prev,
-                              [request._id]: e.target.value
-                            }))
-                          }
+                          onChange={(e) => handleRequestNoteChange(request._id, e.target.value)}
                         />
 
                         <div className="task-actions-row">
-                          <button onClick={() => updateHolidayRequest(request._id, "approved")}>
+                          <button onClick={() => updateHolidayRequest(request._id, STATUS_APPROVED)}>
                             Approve
                           </button>
                           <button
                             className="delete-site-btn"
-                            onClick={() => updateHolidayRequest(request._id, "denied")}
+                            onClick={() => updateHolidayRequest(request._id, STATUS_DENIED)}
                           >
                             Reject
                           </button>
@@ -256,9 +269,7 @@ export default function ManagerHolidayRequestsPage() {
             {filteredRequests.length > 0 && (
               <div className="manager-holiday-pagination">
                 <span className="manager-holiday-pagination-info">
-                  Showing {(currentPage - 1) * REQUESTS_PER_PAGE + 1}-
-                  {Math.min(currentPage * REQUESTS_PER_PAGE, filteredRequests.length)} of{" "}
-                  {filteredRequests.length}
+                  Showing {startItem}-{endItem} of {filteredRequests.length}
                 </span>
                 <div className="manager-holiday-pagination-controls">
                   <button
