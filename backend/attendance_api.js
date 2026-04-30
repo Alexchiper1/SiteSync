@@ -1,7 +1,7 @@
 import express from "express";
 import { MongoClient, ObjectId } from "mongodb";
 
-// Create an isolated router so these attendance endpoints can be mounted in server.js.
+// Create an isolated router so the attendance endpoints can be mounted in server.js.
 const router = express.Router();
 
 // Read Mongo connection string from environment variables.
@@ -14,23 +14,23 @@ const client = new MongoClient(uri);
 
 // Reuse one DB connection across requests.
 async function getDb() {
-  // If there is no active topology/connection yet, open one now.
+  // If there is no connection yet, open one now.
   if (!client.topology || !client.topology.isConnected()) {
     await client.connect();
   }
-  // Use "app" database (where "sites" and "attendance" collections live).
+  // Use app database 
   return client.db("app");
 }
 
 // --- helpers ---
-// Distance calculator used to enforce geofence check-in/check-out.
+// Distance calculator used to enforce check-in and check-out.
 function haversineMeters(lat1, lon1, lat2, lon2) {
   // Earth radius in meters.
   const R = 6371000;
-  // Convert degrees to radians before trig calculations.
+  // Convert degrees to radians before calculations.
   const toRad = (v) => (v * Math.PI) / 180;
 
-  // Delta latitude and longitude (in radians).
+  // Delta latitude and longitude .
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
 
@@ -42,11 +42,11 @@ function haversineMeters(lat1, lon1, lat2, lon2) {
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
 
-  // Great-circle distance in meters.
+  // circle distance in meters.
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-// Lowercase + trim email so matching is consistent across requests.
+// Lowercase and trim email so its consistent across requests.
 function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
@@ -68,15 +68,15 @@ router.post("/attendance/check-in", async (req, res) => {
     // Get DB handle.
     const db = await getDb();
 
-    // Get assigned site location/radius. Employee must be within this radius.
-    // Convert string siteId into Mongo ObjectId for _id lookup.
+    // Get assigned site location. Employee must be within this radius.
+    // Convert string siteId into Mongo ObjectId for the id lookup.
     const site = await db.collection("sites").findOne({ _id: new ObjectId(siteId) });
     // If site doesn't exist, cannot validate geofence.
     if (!site) return res.status(404).json({ msg: "Site not found" });
 
     // Radius fallback to 100m if site has no configured radius.
     const radius = Number(site.radiusMeters ?? 100);
-    // Compute employee-to-site distance from GPS coordinates.
+    // Compute employee to site distance from GPS coordinates.
     const dist = haversineMeters(employeeLat, employeeLng, site.lat, site.lng);
 
     // Reject check-in when employee is outside allowed geofence.
@@ -84,15 +84,15 @@ router.post("/attendance/check-in", async (req, res) => {
       return res.status(403).json({ msg: `Not within radius (${Math.round(dist)}m away)` });
     }
 
-    // Normalize once and reuse in queries/inserts.
+    // Normalize once and reuse in queries
     const email = normalizeEmail(employeeEmail);
 
-    // Prevent multiple open check-ins for the same employee + site.
+    // Prevent multiple open check-ins for the same employee site.
     const existingOpen = await db.collection("attendance").findOne({
-      // Store/query siteId as string in attendance docs.
+      // Store query siteId as string in attendance docs.
       siteId: String(siteId),
       employeeEmail: email,
-      // "Open" means check-out timestamp has not been set yet.
+      // Open means check out timestamp has not been set yet.
       checkOutAt: null
     });
 
@@ -111,7 +111,7 @@ router.post("/attendance/check-in", async (req, res) => {
       employeeEmail: email,
       // If no display name sent, fallback to email.
       employeeName: employeeName || email,
-      // Check-in timestamp created by backend server clock.
+      // Check in timestamp created by backend server clock.
       checkInAt: new Date(),
       // Null until employee checks out.
       checkOutAt: null
@@ -159,7 +159,7 @@ router.post("/attendance/check-out", async (req, res) => {
     // Normalize email before lookup.
     const email = normalizeEmail(employeeEmail);
 
-    // Find the active row created by check-in (checkOutAt is still null).
+    // Find the active row created by check-in.
     const openRecord = await db.collection("attendance").findOne({
       siteId: String(siteId),
       employeeEmail: email,
@@ -171,11 +171,11 @@ router.post("/attendance/check-out", async (req, res) => {
       return res.status(400).json({ msg: "No active check-in found" });
     }
 
-    // "Close" the open attendance row by stamping checkOutAt.
+    // Close the open attendance row by stamping checkOutAt.
     await db.collection("attendance").updateOne(
       // Update by the exact attendance document id found above.
       { _id: openRecord._id },
-      // Set checkout timestamp to "now".
+      // Set checkout timestamp to now.
       { $set: { checkOutAt: new Date() } }
     );
 
@@ -197,30 +197,30 @@ router.get("/attendance/manager/:managerEmail", async (req, res) => {
     // Read manager email from URL parameter and normalize it for matching.
     const managerEmail = normalizeEmail(req.params.managerEmail);
 
-    // Optional query string date; when omitted, today is used.
+    // Optional query string date, when omitted, today is used.
     const dateStr = req.query.date;
     // Start of date range in UTC.
     const start = dateStr ? new Date(dateStr + "T00:00:00.000Z") : new Date();
     // If no explicit date was provided, force start to today's UTC midnight.
     if (!dateStr) start.setUTCHours(0, 0, 0, 0);
 
-    // End boundary is start + 1 day (exclusive upper bound).
+    // End boundary is start + 1 day 
     const end = new Date(start);
     end.setUTCDate(end.getUTCDate() + 1);
 
     // Manager app calls this endpoint with its email.
     // Because managerEmail is stored in attendance rows at check-in time,
-    // this becomes a direct query (no join needed).
+    // this becomes a direct query 
     const rows = await db
       .collection("attendance")
       .find({
         managerEmail,
-        // Return rows where check-in happened during [start, end).
+        // Return rows where check-in happened during start, end
         checkInAt: { $gte: start, $lt: end }
       })
       // Newest first.
       .sort({ checkInAt: -1 })
-      // Materialize cursor into array for JSON response.
+      //array for JSON response.
       .toArray();
 
     // Send attendance rows to frontend manager screen.
@@ -255,7 +255,7 @@ router.get("/attendance/manager-history/:managerEmail", async (req, res) => {
       end = new Date(`${endDate}T00:00:00.000Z`);
       end.setUTCDate(end.getUTCDate() + 1);
     } else {
-      // Default fallback range = last 7 days (today included).
+      // Default fallback range = last 7 days 
       end = new Date();
       // End of current day.
       end.setUTCHours(23, 59, 59, 999);
@@ -278,7 +278,7 @@ router.get("/attendance/manager-history/:managerEmail", async (req, res) => {
 
     res.json(rows);
   } catch (err) {
-    // Route-specific error log message for easier troubleshooting.
+    // Route specific error log message for easier troubleshooting.
     console.error("GET /attendance/manager-history failed:", err);
     // Include err.message when available for slightly more detail.
     res.status(500).json({ msg: err.message || "Server error" });

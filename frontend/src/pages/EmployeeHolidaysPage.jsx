@@ -12,7 +12,6 @@ export default function EmployeeHolidaysPage() {
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [mySites, setMySites] = useState([]);
   const [holidayRequests, setHolidayRequests] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [holidayForm, setHolidayForm] = useState({
     siteId: "",
@@ -38,19 +37,7 @@ export default function EmployeeHolidaysPage() {
     loadHolidayRequests();
   }, [loadHolidayRequests, loadMySites]);
 
-  const filteredRequests = useMemo(() => {
-    if (statusFilter === "all") {
-      return holidayRequests;
-    }
-
-    return holidayRequests.filter((request) => request.status === statusFilter);
-  }, [holidayRequests, statusFilter]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE));
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter]);
+  const totalPages = Math.max(1, Math.ceil(holidayRequests.length / REQUESTS_PER_PAGE));
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -60,19 +47,8 @@ export default function EmployeeHolidaysPage() {
 
   const paginatedRequests = useMemo(() => {
     const start = (currentPage - 1) * REQUESTS_PER_PAGE;
-    return filteredRequests.slice(start, start + REQUESTS_PER_PAGE);
-  }, [currentPage, filteredRequests]);
-
-  const counts = useMemo(() => {
-    return holidayRequests.reduce(
-      (acc, request) => {
-        acc.total += 1;
-        acc[request.status] = (acc[request.status] || 0) + 1;
-        return acc;
-      },
-      { total: 0, pending: 0, approved: 0, denied: 0 }
-    );
-  }, [holidayRequests]);
+    return holidayRequests.slice(start, start + REQUESTS_PER_PAGE);
+  }, [currentPage, holidayRequests]);
 
   const submitHolidayRequest = async () => {
     if (!holidayForm.siteId || !holidayForm.startDate || !holidayForm.endDate) {
@@ -119,8 +95,7 @@ export default function EmployeeHolidaysPage() {
           <div className="dashboard-header">
             <h1>Employee Holidays</h1>
             <p className="employee-holidays-subtitle">
-              Request time off, include a reason if needed, and track whether each request is
-              pending, approved, or rejected.
+              Request time off and include a reason if needed.
             </p>
           </div>
 
@@ -129,25 +104,6 @@ export default function EmployeeHolidaysPage() {
               {message.text}
             </div>
           )}
-
-          <div className="employee-holiday-stats">
-            <div className="employee-holiday-stat-card">
-              <span>Total</span>
-              <strong>{counts.total}</strong>
-            </div>
-            <div className="employee-holiday-stat-card">
-              <span>Pending</span>
-              <strong>{counts.pending}</strong>
-            </div>
-            <div className="employee-holiday-stat-card">
-              <span>Approved</span>
-              <strong>{counts.approved}</strong>
-            </div>
-            <div className="employee-holiday-stat-card">
-              <span>Rejected</span>
-              <strong>{counts.denied}</strong>
-            </div>
-          </div>
 
           <section className="create-site-form">
             <h2>Request Holiday</h2>
@@ -200,22 +156,12 @@ export default function EmployeeHolidaysPage() {
           <section className="create-site-form">
             <div className="employee-holiday-history-header">
               <h2>Holiday Request History</h2>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="employee-holiday-filter"
-              >
-                <option value="all">All requests</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="denied">Rejected</option>
-              </select>
             </div>
 
-            {filteredRequests.length === 0 ? (
+            {holidayRequests.length === 0 ? (
               <div className="employee-section-card">
                 <p className="employee-holidays-empty">
-                  No holiday requests match the selected filter.
+                  No holiday requests yet.
                 </p>
               </div>
             ) : (
@@ -253,12 +199,12 @@ export default function EmployeeHolidaysPage() {
               </div>
             )}
 
-            {filteredRequests.length > 0 && (
+            {holidayRequests.length > 0 && (
               <div className="employee-holiday-pagination">
                 <span className="employee-holiday-pagination-info">
                   Showing {(currentPage - 1) * REQUESTS_PER_PAGE + 1}-
-                  {Math.min(currentPage * REQUESTS_PER_PAGE, filteredRequests.length)} of{" "}
-                  {filteredRequests.length}
+                  {Math.min(currentPage * REQUESTS_PER_PAGE, holidayRequests.length)} of{" "}
+                  {holidayRequests.length}
                 </span>
                 <div className="employee-holiday-pagination-controls">
                   <button
