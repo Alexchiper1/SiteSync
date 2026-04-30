@@ -1,41 +1,13 @@
 .manager-tasks-header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: flex-start;
 }
 
 .manager-tasks-subtitle {
   margin: 10px 0 0;
   text-align: left;
   color: #4b5563;
-}
-
-.manager-task-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.manager-task-stat-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-}
-
-.manager-task-stat-card span {
-  display: block;
-  margin-bottom: 8px;
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.manager-task-stat-card strong {
-  color: #111827;
-  font-size: 1.5rem;
 }
 
 .manager-task-form-grid {
@@ -65,18 +37,6 @@
 
 .manager-task-form-grid button {
   grid-column: 1 / -1;
-}
-
-.manager-task-filters {
-  display: grid;
-  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.manager-task-filters input,
-.manager-task-filters select {
-  margin-bottom: 0;
 }
 
 .manager-task-empty {
@@ -170,12 +130,7 @@
 }
 
 @media (max-width: 960px) {
-  .manager-task-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .manager-task-form-grid,
-  .manager-task-filters {
+  .manager-task-form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -185,10 +140,6 @@
 }
 
 @media (max-width: 640px) {
-  .manager-task-stats {
-    grid-template-columns: 1fr;
-  }
-
   .manager-task-pagination,
   .manager-task-pagination-controls {
     flex-direction: column;
