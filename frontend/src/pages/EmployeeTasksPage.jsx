@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../css/EmployeeOverviewPage.css";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeTasksPage.css";
@@ -11,7 +11,6 @@ export default function EmployeeTasksPage() {
   const [photos, setPhotos] = useState({});
   const [unableInputs, setUnableInputs] = useState({});
   const [message, setMessage] = useState({ text: "", type: "info" });
-  const [statusFilter, setStatusFilter] = useState("all");
 
   const loadTasks = useCallback(async () => {
     const res = await fetch(apiUrl(`/tasks/${currentUser.email.trim().toLowerCase()}`));
@@ -21,18 +20,6 @@ export default function EmployeeTasksPage() {
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
-
-  const filteredTasks = useMemo(() => {
-    if (statusFilter === "all") {
-      return tasks;
-    }
-
-    if (statusFilter === "pending") {
-      return tasks.filter((task) => task.status === "assigned");
-    }
-
-    return tasks.filter((task) => task.status === statusFilter);
-  }, [statusFilter, tasks]);
 
   const completeTask = async (taskId) => {
     if (!photos[taskId]) {
@@ -111,21 +98,15 @@ export default function EmployeeTasksPage() {
           <section className="create-site-form">
             <div className="employee-tasks-toolbar">
               <h2>Task List</h2>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="all">All tasks</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="unable">Unable</option>
-              </select>
             </div>
 
-            {filteredTasks.length === 0 ? (
+            {tasks.length === 0 ? (
               <div className="employee-section-card">
-                <p className="employee-tasks-empty">No tasks match the current filter.</p>
+                <p className="employee-tasks-empty">No tasks assigned yet.</p>
               </div>
             ) : (
               <div className="employee-task-grid">
-                {filteredTasks.map((task) => (
+                {tasks.map((task) => (
                   <article key={task._id} className="task-card employee-task-card">
                     <div className="employee-task-card-top">
                       <div>
