@@ -6,21 +6,9 @@ import ManagerSidebar from "../components/ManagerSidebar";
 import { apiUrl } from "../lib/api";
 
 const REQUESTS_PER_PAGE = 8;
-const STATUS_ALL = "all";
 const STATUS_PENDING = "pending";
 const STATUS_APPROVED = "approved";
 const STATUS_DENIED = "denied";
-
-function RefreshIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="site-icon-svg">
-      <path
-        d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
 
 export default function ManagerHolidayRequestsPage() {
   // Logged-in manager used for manager-scoped API requests.
@@ -28,7 +16,6 @@ export default function ManagerHolidayRequestsPage() {
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [requestNotes, setRequestNotes] = useState({});
   const [message, setMessage] = useState({ text: "", type: "info" });
-  const [statusFilter, setStatusFilter] = useState(STATUS_ALL);
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadHolidayRequests = useCallback(async () => {
@@ -47,20 +34,7 @@ export default function ManagerHolidayRequestsPage() {
     loadHolidayRequests();
   }, [loadHolidayRequests]);
 
-  const filteredRequests = useMemo(() => {
-    // Keep all rows when no status filter is selected.
-    if (statusFilter === STATUS_ALL) {
-      return holidayRequests;
-    }
-
-    return holidayRequests.filter((request) => request.status === statusFilter);
-  }, [holidayRequests, statusFilter]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE));
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter]);
+  const totalPages = Math.max(1, Math.ceil(holidayRequests.length / REQUESTS_PER_PAGE));
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -71,20 +45,8 @@ export default function ManagerHolidayRequestsPage() {
   const paginatedRequests = useMemo(() => {
     // Render only the current page slice to keep the list manageable.
     const start = (currentPage - 1) * REQUESTS_PER_PAGE;
-    return filteredRequests.slice(start, start + REQUESTS_PER_PAGE);
-  }, [currentPage, filteredRequests]);
-
-  const counts = useMemo(() => {
-    // Compute status totals for the summary cards.
-    return holidayRequests.reduce(
-      (acc, request) => {
-        acc.total += 1;
-        acc[request.status] = (acc[request.status] || 0) + 1;
-        return acc;
-      },
-      { total: 0, pending: 0, approved: 0, denied: 0 }
-    );
-  }, [holidayRequests]);
+    return holidayRequests.slice(start, start + REQUESTS_PER_PAGE);
+  }, [currentPage, holidayRequests]);
 
   const updateHolidayRequest = async (requestId, status) => {
     const res = await fetch(apiUrl(`/holiday-requests/${requestId}`), {
@@ -114,7 +76,7 @@ export default function ManagerHolidayRequestsPage() {
   };
 
   const startItem = (currentPage - 1) * REQUESTS_PER_PAGE + 1;
-  const endItem = Math.min(currentPage * REQUESTS_PER_PAGE, filteredRequests.length);
+  const endItem = Math.min(currentPage * REQUESTS_PER_PAGE, holidayRequests.length);
 
   return (
     <div className="manager-section-page">
@@ -130,15 +92,6 @@ export default function ManagerHolidayRequestsPage() {
                 optional note.
               </p>
             </div>
-            <button
-              type="button"
-              className="header-icon-button"
-              aria-label="Refresh holiday requests"
-              title="Refresh holiday requests"
-              onClick={loadHolidayRequests}
-            >
-              <RefreshIcon />
-            </button>
           </div>
 
           {message.text && (
@@ -147,55 +100,15 @@ export default function ManagerHolidayRequestsPage() {
             </div>
           )}
 
-          <div className="manager-holiday-stats">
-            <div className="manager-holiday-stat-card">
-              <span>Total</span>
-              <strong>{counts.total}</strong>
-            </div>
-            <div className="manager-holiday-stat-card">
-              <span>Pending</span>
-              <strong>{counts.pending}</strong>
-            </div>
-            <div className="manager-holiday-stat-card">
-              <span>Approved</span>
-              <strong>{counts.approved}</strong>
-            </div>
-            <div className="manager-holiday-stat-card">
-              <span>Rejected</span>
-              <strong>{counts.denied}</strong>
-            </div>
-          </div>
-
           <section className="create-site-form">
             <div className="section-header-row">
               <h2>Holiday Request List</h2>
-              <div className="manager-holiday-filter-wrap">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="manager-holiday-filter"
-                >
-                  <option value={STATUS_ALL}>All requests</option>
-                  <option value={STATUS_PENDING}>Pending</option>
-                  <option value={STATUS_APPROVED}>Approved</option>
-                  <option value={STATUS_DENIED}>Rejected</option>
-                </select>
-                <button
-                  type="button"
-                  className="header-icon-button"
-                  aria-label="Refresh filtered requests"
-                  title="Refresh filtered requests"
-                  onClick={loadHolidayRequests}
-                >
-                  <RefreshIcon />
-                </button>
-              </div>
             </div>
 
-            {filteredRequests.length === 0 ? (
+            {holidayRequests.length === 0 ? (
               <div className="manager-section-card">
                 <p className="manager-holiday-empty">
-                  No holiday requests match the selected filter.
+                  No holiday requests found.
                 </p>
               </div>
             ) : (
@@ -266,10 +179,10 @@ export default function ManagerHolidayRequestsPage() {
               </div>
             )}
 
-            {filteredRequests.length > 0 && (
+            {holidayRequests.length > 0 && (
               <div className="manager-holiday-pagination">
                 <span className="manager-holiday-pagination-info">
-                  Showing {startItem}-{endItem} of {filteredRequests.length}
+                  Showing {startItem}-{endItem} of {holidayRequests.length}
                 </span>
                 <div className="manager-holiday-pagination-controls">
                   <button
