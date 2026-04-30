@@ -1,59 +1,13 @@
 .manager-attendance-header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: flex-start;
 }
 
 .manager-attendance-subtitle {
   margin: 10px 0 0;
   text-align: left;
   color: #4b5563;
-}
-
-.manager-attendance-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.manager-attendance-stat-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-}
-
-.manager-attendance-stat-card span {
-  display: block;
-  margin-bottom: 8px;
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.manager-attendance-stat-card strong {
-  color: #111827;
-  font-size: 1.5rem;
-}
-
-.manager-attendance-filters {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  align-items: end;
-}
-
-.manager-attendance-filter-field label {
-  display: block;
-  margin-bottom: 8px;
-  color: #374151;
-  font-weight: 600;
-}
-
-.manager-attendance-filter-field input {
-  margin-bottom: 0;
 }
 
 .manager-attendance-empty {
@@ -78,10 +32,5 @@
 @media (max-width: 960px) {
   .manager-attendance-header {
     align-items: stretch;
-  }
-
-  .manager-attendance-stats,
-  .manager-attendance-filters {
-    grid-template-columns: 1fr;
   }
 }
