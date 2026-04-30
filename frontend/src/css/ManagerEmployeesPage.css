@@ -4,24 +4,6 @@
   color: #4b5563;
 }
 
-.manager-employees-toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 220px) minmax(180px, 220px);
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.manager-employees-toolbar input,
-.manager-employees-toolbar select {
-  margin-bottom: 0;
-}
-
-.manager-employees-summary {
-  margin-bottom: 16px;
-  color: #6b7280;
-  font-weight: 600;
-}
-
 .manager-employees-empty {
   margin: 0;
 }
@@ -74,95 +56,9 @@
   color: #6b7280;
 }
 
-.manager-employee-meta {
-  display: grid;
-  gap: 10px;
-}
-
-.manager-employee-meta-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 12px;
-  border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-}
-
-.manager-employee-meta-row span {
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.manager-employee-meta-row strong {
-  color: #111827;
-  text-align: right;
-}
-
-.manager-employee-extra-sites {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #f0fdfa;
-  border: 1px solid #ccfbf1;
-}
-
-.manager-employee-extra-sites span,
-.manager-employee-extra-sites strong {
-  display: block;
-}
-
-.manager-employee-extra-sites span {
-  margin-bottom: 4px;
-  color: #0f766e;
-  font-weight: 700;
-}
-
-.manager-employee-task-link {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
-  color: #ffffff;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 10px 20px rgba(20, 184, 166, 0.2);
-}
-
-.manager-employee-task-link:hover {
-  color: #ffffff;
-  text-decoration: none;
-  background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
-}
-
-.status-checked-in {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-}
-
-.status-checked-out {
-  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-  color: #ffffff;
-}
-
-@media (max-width: 900px) {
-  .manager-employees-toolbar {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 640px) {
-  .manager-employee-top,
-  .manager-employee-meta-row {
+  .manager-employee-top {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .manager-employee-meta-row strong {
-    text-align: left;
   }
 }
