@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerAttendancePage.css";
