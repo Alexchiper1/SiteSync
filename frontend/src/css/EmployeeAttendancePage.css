@@ -4,14 +4,6 @@
   color: #4b5563;
 }
 
-.employee-attendance-status-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.employee-attendance-status-card,
 .employee-attendance-record-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -20,7 +12,6 @@
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
 }
 
-.employee-attendance-status-card span,
 .employee-attendance-feedback-row span {
   display: block;
   margin-bottom: 6px;
@@ -64,51 +55,13 @@
   margin: 0;
 }
 
-.employee-attendance-history-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.employee-attendance-date-range {
-  display: flex;
-  gap: 10px;
-}
-
-.employee-attendance-date-range input {
-  margin-bottom: 0;
-}
-
-.employee-attendance-history-grid {
-  display: grid;
-  gap: 14px;
-}
-
-@media (max-width: 900px) {
-  .employee-attendance-status-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 640px) {
-  .employee-attendance-history-header,
-  .employee-attendance-feedback-row,
-  .employee-attendance-date-range {
+  .employee-attendance-feedback-row {
     flex-direction: column;
     align-items: flex-start;
   }
 
   .employee-attendance-feedback-row strong {
     text-align: left;
-  }
-
-  .employee-attendance-date-range {
-    width: 100%;
-  }
-
-  .employee-attendance-date-range input {
-    width: 100%;
   }
 }

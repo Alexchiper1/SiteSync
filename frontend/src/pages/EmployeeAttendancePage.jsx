@@ -24,14 +24,6 @@ function formatTime(value) {
   });
 }
 
-function formatDate(value) {
-  return new Date(value).toLocaleDateString([], {
-    weekday: "short",
-    day: "numeric",
-    month: "short"
-  });
-}
-
 export default function EmployeeAttendancePage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [message, setMessage] = useState({ text: "", type: "info" });
@@ -39,7 +31,6 @@ export default function EmployeeAttendancePage() {
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedSite, setSelectedSite] = useState(null);
   const [userPos, setUserPos] = useState(null);
-  const [distance, setDistance] = useState(null);
   const [isWithin, setIsWithin] = useState(false);
   const [checkedIn, setCheckedIn] = useState(false);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
@@ -51,8 +42,6 @@ export default function EmployeeAttendancePage() {
     return toDateInputValue(date);
   }, []);
   const defaultEnd = useMemo(() => toDateInputValue(today), [today]);
-  const [startDate, setStartDate] = useState(defaultStart);
-  const [endDate, setEndDate] = useState(defaultEnd);
 
   const loadMySites = useCallback(async () => {
     const res = await fetch(apiUrl(`/employee-sites/${currentUser.email.trim().toLowerCase()}`));
@@ -61,15 +50,15 @@ export default function EmployeeAttendancePage() {
 
   const loadAttendanceHistory = useCallback(async () => {
     const params = new URLSearchParams({
-      startDate,
-      endDate
+      startDate: defaultStart,
+      endDate: defaultEnd
     });
 
     const res = await fetch(
       apiUrl(`/attendance/employee-history/${currentUser.email.trim().toLowerCase()}?${params.toString()}`)
     );
     setAttendanceHistory(await res.json());
-  }, [currentUser.email, endDate, startDate]);
+  }, [currentUser.email, defaultEnd, defaultStart]);
 
   useEffect(() => {
     loadMySites();
@@ -99,7 +88,6 @@ export default function EmployeeAttendancePage() {
     const loadSite = async () => {
       if (!selectedSiteId) {
         setSelectedSite(null);
-        setDistance(null);
         setIsWithin(false);
         setCheckedIn(false);
         return;
@@ -120,7 +108,6 @@ export default function EmployeeAttendancePage() {
 
   useEffect(() => {
     if (!selectedSite?.lat || !selectedSite?.lng || !userPos?.lat || !userPos?.lng) {
-      setDistance(null);
       setIsWithin(false);
       return;
     }
@@ -132,7 +119,6 @@ export default function EmployeeAttendancePage() {
       selectedSite.lng
     );
 
-    setDistance(d);
     const radius = Number(selectedSite.radiusMeters ?? 100);
     setIsWithin(d <= radius);
   }, [selectedSite, userPos]);
@@ -214,8 +200,7 @@ export default function EmployeeAttendancePage() {
           <div className="dashboard-header">
             <h1>Employee Attendance</h1>
             <p className="employee-attendance-subtitle">
-              Track your location, check in or out when within range, and review your recent
-              attendance history.
+              Track your location and check in or out when within range.
             </p>
           </div>
 
@@ -240,21 +225,6 @@ export default function EmployeeAttendancePage() {
               ))}
             </select>
 
-            <div className="employee-attendance-status-grid">
-              <div className="employee-attendance-status-card">
-                <span>Current location</span>
-                <strong>{userPos ? "Location detected" : "Waiting for GPS"}</strong>
-              </div>
-              <div className="employee-attendance-status-card">
-                <span>Radius status</span>
-                <strong>{selectedSite ? (isWithin ? "Within radius" : "Outside radius") : "No site selected"}</strong>
-              </div>
-              <div className="employee-attendance-status-card">
-                <span>Attendance state</span>
-                <strong>{checkedIn ? "Checked in" : "Not checked in"}</strong>
-              </div>
-            </div>
-
             {selectedSite && (
               <>
                 <div className="employee-attendance-map-wrap">
@@ -262,10 +232,6 @@ export default function EmployeeAttendancePage() {
                 </div>
 
                 <div className="employee-attendance-feedback">
-                  <div className="employee-attendance-feedback-row">
-                    <span>Distance to site</span>
-                    <strong>{distance == null ? "..." : `${Math.round(distance)}m`}</strong>
-                  </div>
                   <div className="employee-attendance-feedback-row">
                     <span>Allowed radius</span>
                     <strong>{Number(selectedSite.radiusMeters ?? 100)}m</strong>
@@ -323,57 +289,6 @@ export default function EmployeeAttendancePage() {
             )}
           </section>
 
-          <section className="create-site-form">
-            <div className="employee-attendance-history-header">
-              <h2>Recent Attendance History</h2>
-              <div className="employee-attendance-date-range">
-                <input
-                  type="date"
-                  value={startDate}
-                  max={endDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-                <input
-                  type="date"
-                  value={endDate}
-                  min={startDate}
-                  max={defaultEnd}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {attendanceHistory.length === 0 ? (
-              <div className="employee-section-card">
-                <p className="employee-attendance-empty">
-                  No attendance history found for the selected dates.
-                </p>
-              </div>
-            ) : (
-              <div className="employee-attendance-history-grid">
-                {attendanceHistory.map((row) => (
-                  <article key={row._id} className="employee-attendance-record-card">
-                    <div className="employee-attendance-feedback-row">
-                      <span>Date</span>
-                      <strong>{formatDate(row.checkInAt)}</strong>
-                    </div>
-                    <div className="employee-attendance-feedback-row">
-                      <span>Site</span>
-                      <strong>{row.siteName}</strong>
-                    </div>
-                    <div className="employee-attendance-feedback-row">
-                      <span>Check In</span>
-                      <strong>{formatTime(row.checkInAt)}</strong>
-                    </div>
-                    <div className="employee-attendance-feedback-row">
-                      <span>Check Out</span>
-                      <strong>{formatTime(row.checkOutAt)}</strong>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
         </main>
       </div>
     </div>
