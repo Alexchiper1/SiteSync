@@ -5,10 +5,12 @@ import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
 
 const router = express.Router();
 
+//compare emails. This prevents dup accounts and lookup misses.
 function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+//email validation for registration. rejects empty, spaced, double-dot, and malformed addresses before they are saved in MongoDB.
 function isValidEmail(email) {
   const value = normalizeEmail(email);
 
@@ -23,10 +25,12 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 }
 
+//passwords are bcrypt hashes, and this check tells login which path to use.
 function isBcryptHash(value) {
   return /^\$2[aby]\$\d{2}\$/.test(String(value || ""));
 }
 
+// Upload a profile image to Cloudinary when Cloudinary credentials are present, The returned value is the public image URL, and that URL is what gets stored,in MongoDB as user.profileImage.
 function uploadProfileImage(file) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -45,23 +49,25 @@ function uploadProfileImage(file) {
       }
     );
 
+    // uploadStorage.js uses memory for Cloudinary, so Multer gives file buffer that can be sent to Cloudinary.
     uploadStream.end(file.buffer);
   });
 }
 
 // ---------------- USERS ----------------
 
-router.get("/users", async (req, res) => {
-  const db = await getDb();
-  const users = await db.collection("users").find({}, { projection: { password: 0 } }).toArray();
-  res.json(users);
-});
-
+//Return employees belong to site owned by manager.
+//tells us which sites the manager owns,
+//siteMembers tells us which employees joined those sites,
+//users gives profile details,
+//attendance gives today's check-in status,
+//tasks gives the manager task count per employee.
 router.get("/manager-employees/:managerEmail", async (req, res) => {
   try {
     const db = await getDb();
     const managerEmail = normalizeEmail(req.params.managerEmail);
 
+    //employees are scoped to the manager work locations.
     const sites = await db
       .collection("sites")
       .find({ managerEmail })
@@ -69,21 +75,26 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
 
     const siteIds = sites.map((site) => String(site._id));
 
+    //no sites means no employees can be assigned.
     if (siteIds.length === 0) {
       return res.json([]);
     }
 
+    // siteMembers is the join table between employees and sites.
     const members = await db
       .collection("siteMembers")
       .find({ siteId: { $in: siteIds } })
       .toArray();
 
+    //No site members means the manager has sites but no joined employees yet.
     if (members.length === 0) {
       return res.json([]);
     }
 
+    //undupkicate emails because one employee can join more than one of the manager sites.
     const employeeEmails = [...new Set(members.map((member) => normalizeEmail(member.employeeEmail)))];
 
+    // Load profile, attendance, and task 
     const [users, todaysAttendance, tasks] = await Promise.all([
       db
         .collection("users")
@@ -95,6 +106,7 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
         const end = new Date(start);
         end.setUTCDate(end.getUTCDate() + 1);
 
+        //attendance is filtered to today so the manager page can show a current, check-in/check-out statu
         return db
           .collection("attendance")
           .find({
@@ -115,6 +127,7 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
     const statusMap = new Map();
     const taskCountMap = new Map();
 
+    // Build joinedSites per employee for display and for manager task assignment
     members.forEach((member) => {
       const email = normalizeEmail(member.employeeEmail);
       const existing = membershipMap.get(email) || [];
@@ -127,6 +140,7 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
       membershipMap.set(email, existing);
     });
 
+    //"checked in" if an employee has multiple attendance rows today andat least one is still open.
     todaysAttendance.forEach((row) => {
       const email = normalizeEmail(row.employeeEmail);
       const nextStatus = row.checkOutAt ? "checked out" : "checked in";
@@ -137,11 +151,13 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
       }
     });
 
+    // Count tasks per employee for manager employee card.
     tasks.forEach((task) => {
       const email = normalizeEmail(task.employeeEmail);
       taskCountMap.set(email, (taskCountMap.get(email) || 0) + 1);
     });
 
+    //one frontend object per employee. If site member exists before a user record is found,  email still appears as a fallback.
     const employees = employeeEmails.map((email) => {
       const user = userMap.get(email);
       const joinedSites = membershipMap.get(email) || [];
@@ -168,6 +184,9 @@ router.get("/manager-employees/:managerEmail", async (req, res) => {
   }
 });
 
+// Register a new account.
+// The frontend sends name, email, password, role, and optional companyName.
+// Passwords are hashed before storage so MongoDB never stores passwords.
 router.post("/users", async (req, res) => {
   try {
     if (!req.body?.name || !req.body?.email || !req.body?.password || !req.body?.role) {
@@ -186,7 +205,7 @@ router.post("/users", async (req, res) => {
 
     const db = await getDb();
 
-    // check if email already exists
+    //reject duplicate emails beforeinserting the new user.
     const existingUser = await db.collection("users").findOne({ email });
 
     if (existingUser) {
@@ -210,6 +229,8 @@ router.post("/users", async (req, res) => {
   }
 });
 
+// Log a user in.
+// The route finds the user by normalized email, checks password, and returns user object without the password so the frontend can store the safe user details in localStorage.
 router.post("/login", async (req, res) => {
   try {
     const db = await getDb();
@@ -228,7 +249,7 @@ router.post("/login", async (req, res) => {
     if (isBcryptHash(storedPassword)) {
       isValidPassword = await bcrypt.compare(inputPassword, storedPassword);
     } else {
-      // Backward-compatible: allow old plaintext account once, then upgrade to hash.
+      //old accounts may still have plaintext passwords. If login succeeds, immediately upgrade that password to a bcrypt hash so future logins use the secure path.
       isValidPassword = storedPassword === inputPassword;
       if (isValidPassword) {
         const upgradedHash = await bcrypt.hash(inputPassword, 12);
@@ -246,13 +267,15 @@ router.post("/login", async (req, res) => {
     const { password, ...safeUser } = user;
     res.json(safeUser);
   } catch (err) {
+    console.error("POST /login failed:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
 
+//Update the user profile name and profile picture.The manager and employee profile pages send FormData here. If a image fileincluded, Multer reads the field named profileImage.
 router.put("/users/profile", upload.single("profileImage"), async (req, res) => {
   try {
-    const email = String(req.body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(req.body.email);
     const name = String(req.body.name || "").trim();
 
     if (!email || !name) {
@@ -268,9 +291,12 @@ router.put("/users/profile", upload.single("profileImage"), async (req, res) => 
 
     let profileImage = existingUser.profileImage || "";
 
+    //Cloudinary configurs, uploadProfileImage returns aCloudinary HTTPS URL. That exact URL is saved in MongoDB. The frontend sees that the value starts with http and uses it directly as the
+    //profile picture.
     if (req.file && hasCloudinaryConfig) {
       profileImage = await uploadProfileImage(req.file);
     } else if (req.file) {
+      //local development without Cloudinary, Multer saves the image under uploads/ and MongoDB stores the local path.frontend turnsthat into http://localhost:5000/uploads/... using profileImageUrl().
       profileImage = req.file?.path || req.file?.filename || profileImage;
     }
 
@@ -284,7 +310,11 @@ router.put("/users/profile", upload.single("profileImage"), async (req, res) => 
       }
     );
 
-    const updatedUser = await db.collection("users").findOne({ email });
+    //Return updated user without password because the frontend writes this response to localStorage as the current logged in user.
+    const updatedUser = await db
+      .collection("users")
+      .findOne({ email }, { projection: { password: 0 } });
+
     res.json({
       msg: "Profile updated",
       user: updatedUser
