@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../pictures/LogoNoBack.png";
-import "../css/Login.css";
+import "../css/Auth.css";
 import { apiUrl } from "../lib/api";
 
 export default function Login() {

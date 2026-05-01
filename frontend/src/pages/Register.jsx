@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../pictures/LogoNoBack.png";
-import "../css/Register.css";
+import "../css/Auth.css";
 import { apiUrl } from "../lib/api";
 
 function isValidEmail(email) {
