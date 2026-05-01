@@ -2,18 +2,20 @@ import express from "express";
 import { ObjectId } from "mongodb";
 import { getDb } from "./db.js";
 
+// This file defines every API route that works with sites
 const router = express.Router();
 
 // ---------------- SITES ----------------
-
-// create site
+// Create a new site
+// The frontend sends the site details in req.body, and MongoDB stores that body in the sites collection
 router.post("/sites", async (req, res) => {
   const db = await getDb();
   await db.collection("sites").insertOne(req.body);
   res.status(201).json({ msg: "Site created" });
 });
 
-// get sites for manager
+// Returns all the sites owned by the manager.
+// The manager email comes from the URL, then MongoDB filters sites where the stored managerEmail matches that value
 router.get("/sites/:managerEmail", async (req, res) => {
   const db = await getDb();
 
@@ -25,11 +27,14 @@ router.get("/sites/:managerEmail", async (req, res) => {
   res.json(sites);
 });
 
-// update site
+// Update one site by MongoDB id.
+// Using ObjectId because the _id field in the sites collection is a MongoDB ObjectId
 router.put("/sites/:siteId", async (req, res) => {
   try {
     const db = await getDb();
     const siteId = req.params.siteId;
+
+    // Load the existing site before changing it so we can confirm it exists
     const existingSite = await db.collection("sites").findOne({
       _id: new ObjectId(siteId)
     });
@@ -38,6 +43,8 @@ router.put("/sites/:siteId", async (req, res) => {
       return res.status(404).json({ msg: "Site not found" });
     }
 
+    // Build an explicit update object instead of writing the whole req.body.
+    // this keeps route focused on the fields a site is meant to own.
     const updates = {
       name: req.body.name,
       location: req.body.location,
@@ -48,11 +55,13 @@ router.put("/sites/:siteId", async (req, res) => {
       managerEmail: req.body.managerEmail
     };
 
+    // Save the new site details in the main sites collection.
     await db.collection("sites").updateOne(
       { _id: new ObjectId(siteId) },
       { $set: updates }
     );
 
+    // Several other collections store a copy of siteName for quick display, If the site is renamed, those copied names must be updated too
     if (existingSite.name !== updates.name) {
       await db.collection("siteMembers").updateMany(
         { siteId },
@@ -82,7 +91,7 @@ router.put("/sites/:siteId", async (req, res) => {
   }
 });
 
-// get one site by id (for employee map/check-in)
+// Get site by id, for map display and check-in, where frontend needs the exact site location.
 router.get("/site/:siteId", async (req, res) => {
   try {
     const db = await getDb();
@@ -102,7 +111,7 @@ router.get("/site/:siteId", async (req, res) => {
   }
 });
 
-// search sites
+// Search sites by name, The regular expression lets users find partial (so search a you will find all sites containign a), instead of needing the exact site name.
 router.get("/sites-search/:query", async (req, res) => {
   const db = await getDb();
 
@@ -114,13 +123,14 @@ router.get("/sites-search/:query", async (req, res) => {
   res.json(sites);
 });
 
-// join site
+// Employee join a site, The frontend sends a siteId, joinKey, and employeeEmail. The route first checks that the join key belongs to that site
 router.post("/join-site", async (req, res) => {
   try {
     const { siteId, joinKey, employeeEmail } = req.body;
 
     const db = await getDb();
 
+    // Match both _id and joinKey in one lookup so a valid key for one site
     const site = await db.collection("sites").findOne({
       _id: new ObjectId(siteId),
       joinKey: joinKey
@@ -130,6 +140,7 @@ router.post("/join-site", async (req, res) => {
       return res.status(400).json({ msg: "Invalid join key" });
     }
 
+    // Store email in a normalized format so later lookups by email match even if the user accidentally typs cap letter or space.
     await db.collection("siteMembers").insertOne({
       siteId: siteId,
       siteName: site.name,
@@ -143,7 +154,7 @@ router.post("/join-site", async (req, res) => {
   }
 });
 
-// get sites joined by employee
+// Return every site for the employee.
 router.get("/employee-sites/:email", async (req, res) => {
   const db = await getDb();
 
@@ -155,15 +166,17 @@ router.get("/employee-sites/:email", async (req, res) => {
   res.json(sites);
 });
 
-// DELETE SITE
+// Delete a site,
 router.delete("/sites/:siteId", async (req, res) => {
   try {
     const db = await getDb();
 
+    // The sites uses ObjectId for the _id, so the URL string is converted, before deletion.
     await db.collection("sites").deleteOne({
       _id: new ObjectId(req.params.siteId)
     });
 
+    // Related collections store siteId as a string
     await db.collection("siteMembers").deleteMany({
       siteId: req.params.siteId
     });
@@ -183,4 +196,5 @@ router.delete("/sites/:siteId", async (req, res) => {
   }
 });
 
+// app.js imports this router and mounts it with the other API routers.
 export default router;
