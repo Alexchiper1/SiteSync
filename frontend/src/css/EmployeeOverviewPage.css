@@ -2,15 +2,6 @@
   background: #f5f7fa;
 }
 
-.employee-dashboard {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f5f7fa;
-  gap: 20px;
-  padding: 20px;
-  padding-top: 80px;
-}
-
 .profile-sidebar {
   width: 300px;
   flex-shrink: 0;
@@ -231,10 +222,6 @@
   background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
 }
 
-.search-results {
-  margin-top: 20px;
-}
-
 .search-result-item {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -279,10 +266,6 @@
 
 .join-input-group button:hover {
   background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-}
-
-.my-sites-list {
-  margin: 20px 0;
 }
 
 .site-item {
@@ -384,18 +367,6 @@
   margin: 24px 0 16px 0;
   font-size: 22px;
   font-weight: 600;
-}
-
-.tasks-section {
-  margin-bottom: 32px;
-}
-
-.site-tasks-header {
-  color: #14b8a6;
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  margin-top: 16px;
 }
 
 .holiday-request-list {
@@ -579,13 +550,6 @@
 }
 
 @media (max-width: 900px) {
-  .employee-dashboard {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    padding-top: 72px;
-  }
-
   .profile-sidebar {
     width: 100%;
   }
@@ -654,11 +618,6 @@
 }
 
 @media (max-width: 640px) {
-  .employee-dashboard {
-    padding: 12px;
-    padding-top: 64px;
-  }
-
   .profile-card {
     padding: 18px;
   }
