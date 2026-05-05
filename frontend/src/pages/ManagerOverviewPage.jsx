@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerOverviewPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
-import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
+import { apiUrl } from "../lib/api";
 
 export default function ManagerOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -117,15 +117,6 @@ export default function ManagerOverviewPage() {
 
         <aside className="profile-sidebar">
           <div className="profile-card manager-overview-profile-card">
-            <div className="profile-avatar">
-              <img
-                src={
-                  profileImageUrl(currentUser?.profileImage) ||
-                  profileFallbackUrl(currentUser?.name)
-                }
-                alt="Profile"
-              />
-            </div>
             <h3 className="profile-name">{currentUser?.name || "Manager"}</h3>
             <p className="profile-role">Manager</p>
             <p className="profile-details">{currentUser?.email}</p>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerEmployeesPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
-import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
+import { apiUrl } from "../lib/api";
 
 export default function ManagerEmployeesPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -55,16 +55,6 @@ export default function ManagerEmployeesPage() {
               {employees.map((employee) => (
                 <article key={employee.email} className="manager-employee-card">
                   <div className="manager-employee-top">
-                    <div className="manager-employee-avatar">
-                      <img
-                        src={
-                          profileImageUrl(employee.profileImage) ||
-                          profileFallbackUrl(employee.name)
-                        }
-                        alt={employee.name}
-                      />
-                    </div>
-
                     <div className="manager-employee-heading">
                       <h3>{employee.name}</h3>
                       <p>{employee.email}</p>

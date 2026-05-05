@@ -4,7 +4,7 @@ import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeOverviewPage.css";
 import EmployeeSidebar from "../components/EmployeeSidebar";
 import SiteLiveMap from "../components/SiteLiveMap";
-import { apiUrl, profileFallbackUrl, profileImageUrl } from "../lib/api";
+import { apiUrl } from "../lib/api";
 import { haversineMeters } from "../utils/distance";
 
 export default function EmployeeOverviewPage() {
@@ -180,15 +180,6 @@ export default function EmployeeOverviewPage() {
 
         <aside className="profile-sidebar">
           <div className="profile-card employee-overview-profile-card">
-            <div className="profile-avatar">
-              <img
-                src={
-                  profileImageUrl(currentUser?.profileImage) ||
-                  profileFallbackUrl(currentUser?.name)
-                }
-                alt="Profile"
-              />
-            </div>
             <h3 className="profile-name">{currentUser?.name || "Employee"}</h3>
             <p className="profile-role">Construction Worker</p>
             <p className="profile-details">{currentUser?.email}</p>

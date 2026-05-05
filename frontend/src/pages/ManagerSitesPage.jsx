@@ -20,7 +20,6 @@ export default function ManagerSitesPage() {
   const [site, setSite] = useState(emptySiteForm);
   const [sites, setSites] = useState([]);
   const [deleteSiteId, setDeleteSiteId] = useState("");
-  const [editingSiteId, setEditingSiteId] = useState("");
 
   const loadSites = useCallback(async () => {
     const res = await fetch(apiUrl(`/sites/${currentUser.email}`));
@@ -49,9 +48,8 @@ export default function ManagerSitesPage() {
       return;
     }
 
-    const isEditing = Boolean(editingSiteId);
-    const res = await fetch(apiUrl(isEditing ? `/sites/${editingSiteId}` : "/sites"), {
-      method: isEditing ? "PUT" : "POST",
+    const res = await fetch(apiUrl("/sites"), {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
@@ -61,30 +59,8 @@ export default function ManagerSitesPage() {
 
     if (res.ok) {
       setSite(emptySiteForm);
-      setEditingSiteId("");
       loadSites();
     }
-  };
-
-  const startEditSite = (siteToEdit) => {
-    setEditingSiteId(siteToEdit._id);
-    setSite({
-      name: siteToEdit.name || "",
-      location: siteToEdit.location || "",
-      joinKey: siteToEdit.joinKey || "",
-      radiusMeters: String(siteToEdit.radiusMeters ?? 150),
-      coords:
-        siteToEdit.lat != null && siteToEdit.lng != null
-          ? { lat: siteToEdit.lat, lng: siteToEdit.lng }
-          : null
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const cancelEditSite = () => {
-    setEditingSiteId("");
-    setSite(emptySiteForm);
   };
 
   const deleteSite = async (siteId) => {
@@ -139,7 +115,7 @@ export default function ManagerSitesPage() {
           <div className="dashboard-header">
             <h1>Manager Sites</h1>
             <p className="manager-sites-subtitle">
-              Create sites, update details, set location coordinates, and manage existing sites.
+              Create sites, set location coordinates, and manage existing sites.
             </p>
           </div>
 
@@ -151,16 +127,7 @@ export default function ManagerSitesPage() {
 
           <div className="create-site-form">
             <div className="section-header-row">
-              <h2>{editingSiteId ? "Edit Site" : "Create Site"}</h2>
-              {editingSiteId && (
-                <button
-                  type="button"
-                  className="cancel-action-btn compact-action-btn"
-                  onClick={cancelEditSite}
-                >
-                  Cancel Edit
-                </button>
-              )}
+              <h2>Create Site</h2>
             </div>
 
             <form onSubmit={createSite} className="create-site-grid">
@@ -198,7 +165,7 @@ export default function ManagerSitesPage() {
                   )}
                 </div>
                 <button className="create-site-btn" type="submit">
-                  {editingSiteId ? "Save Changes" : "Create Site"}
+                  Create Site
                 </button>
               </div>
 
@@ -228,25 +195,6 @@ export default function ManagerSitesPage() {
             sites.map((siteItem) => (
               <div key={siteItem._id} className="site-card">
                 <div className="site-card-actions">
-                  <button
-                    className="site-icon-button edit-site-icon"
-                    type="button"
-                    aria-label={`Edit ${siteItem.name}`}
-                    title="Edit site"
-                    onClick={() => startEditSite(siteItem)}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      className="site-icon-svg"
-                    >
-                      <path
-                        d="M3 17.25V21h3.75L18.37 9.38l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l9.62-9.62.92.92L5.92 19.58zM20.71 7.04a1 1 0 000-1.41L18.37 3.3a1 1 0 00-1.41 0l-1.29 1.29 3.75 3.75 1.29-1.3z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-
                   <button
                     className="site-icon-button delete-site-icon"
                     type="button"

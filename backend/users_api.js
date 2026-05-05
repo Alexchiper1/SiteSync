@@ -1,7 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import { getDb } from "./db.js";
-import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
 
 const router = express.Router();
 
@@ -28,30 +27,6 @@ function isValidEmail(email) {
 //passwords are bcrypt hashes, and this check tells login which path to use.
 function isBcryptHash(value) {
   return /^\$2[aby]\$\d{2}\$/.test(String(value || ""));
-}
-
-// Upload a profile image to Cloudinary when Cloudinary credentials are present, The returned value is the public image URL, and that URL is what gets stored,in MongoDB as user.profileImage.
-function uploadProfileImage(file) {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "sitesync/profiles",
-        resource_type: "image",
-        public_id: `${Date.now()}-${file.originalname.replace(/\s+/g, "-")}`
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-
-        resolve(result?.secure_url || result?.url || "");
-      }
-    );
-
-    // uploadStorage.js uses memory for Cloudinary, so Multer gives file buffer that can be sent to Cloudinary.
-    uploadStream.end(file.buffer);
-  });
 }
 
 // ---------------- USERS ----------------
@@ -269,59 +244,6 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("POST /login failed:", err);
     res.status(500).json({ msg: "Server error" });
-  }
-});
-
-//Update the user profile name and profile picture.The manager and employee profile pages send FormData here. If a image fileincluded, Multer reads the field named profileImage.
-router.put("/users/profile", upload.single("profileImage"), async (req, res) => {
-  try {
-    const email = normalizeEmail(req.body.email);
-    const name = String(req.body.name || "").trim();
-
-    if (!email || !name) {
-      return res.status(400).json({ msg: "Name and email are required" });
-    }
-
-    const db = await getDb();
-    const existingUser = await db.collection("users").findOne({ email });
-
-    if (!existingUser) {
-      return res.status(404).json({ msg: "User not found" });
-    }
-
-    let profileImage = existingUser.profileImage || "";
-
-    //Cloudinary configurs, uploadProfileImage returns aCloudinary HTTPS URL. That exact URL is saved in MongoDB. The frontend sees that the value starts with http and uses it directly as the
-    //profile picture.
-    if (req.file && hasCloudinaryConfig) {
-      profileImage = await uploadProfileImage(req.file);
-    } else if (req.file) {
-      //local development without Cloudinary, Multer saves the image under uploads/ and MongoDB stores the local path.frontend turnsthat into http://localhost:5000/uploads/... using profileImageUrl().
-      profileImage = req.file?.path || req.file?.filename || profileImage;
-    }
-
-    await db.collection("users").updateOne(
-      { email },
-      {
-        $set: {
-          name,
-          profileImage
-        }
-      }
-    );
-
-    //Return updated user without password because the frontend writes this response to localStorage as the current logged in user.
-    const updatedUser = await db
-      .collection("users")
-      .findOne({ email }, { projection: { password: 0 } });
-
-    res.json({
-      msg: "Profile updated",
-      user: updatedUser
-    });
-  } catch (err) {
-    console.error("PUT /users/profile failed:", err);
-    res.status(500).json({ msg: err.message || "Server error" });
   }
 });
 
