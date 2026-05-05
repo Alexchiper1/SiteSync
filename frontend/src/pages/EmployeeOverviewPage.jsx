@@ -148,26 +148,6 @@ export default function EmployeeOverviewPage() {
     );
   }, [holidayRequests]);
 
-  const recentActivity = useMemo(() => {
-    const attendanceItems = attendanceHistory.slice(0, 3).map((row) => ({
-      id: `attendance-${row._id}`,
-      title: row.checkOutAt ? "Checked out" : "Checked in",
-      detail: `${row.siteName} · ${new Date(row.checkInAt).toLocaleDateString()}`,
-      time: new Date(row.checkOutAt || row.checkInAt).getTime()
-    }));
-
-    const holidayItems = holidayRequests.slice(0, 3).map((request) => ({
-      id: `holiday-${request._id}`,
-      title: `Holiday ${request.status === "denied" ? "rejected" : request.status}`,
-      detail: `${request.siteName} · ${request.startDate} to ${request.endDate}`,
-      time: new Date(request.createdAt || request.startDate).getTime()
-    }));
-
-    return [...attendanceItems, ...holidayItems]
-      .sort((a, b) => b.time - a.time)
-      .slice(0, 5);
-  }, [attendanceHistory, holidayRequests]);
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -319,22 +299,6 @@ export default function EmployeeOverviewPage() {
               {selectedSite && (
                 <div className="employee-overview-map-wrap">
                   <SiteLiveMap site={selectedSite} userPos={userPos} size={280} />
-                </div>
-              )}
-            </div>
-
-            <div className="create-site-form employee-overview-recent-card">
-              <h2>Recent Activity</h2>
-              {recentActivity.length === 0 ? (
-                <p className="employee-overview-empty">No recent activity yet.</p>
-              ) : (
-                <div className="employee-overview-activity-list">
-                  {recentActivity.map((item) => (
-                    <div key={item.id} className="employee-overview-activity-item">
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
-                    </div>
-                  ))}
                 </div>
               )}
             </div>

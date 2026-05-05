@@ -78,33 +78,6 @@ export default function ManagerOverviewPage() {
     );
   }, [tasks]);
 
-  const recentUpdates = useMemo(() => {
-    const attendanceItems = attendance.slice(0, 3).map((row) => ({
-      id: `attendance-${row._id}`,
-      title: row.checkOutAt ? "Check-out recorded" : "Check-in recorded",
-      detail: `${row.employeeName || row.employeeEmail} · ${row.siteName}`,
-      time: new Date(row.checkOutAt || row.checkInAt).getTime()
-    }));
-
-    const holidayItems = holidayRequests.slice(0, 3).map((request) => ({
-      id: `holiday-${request._id}`,
-      title: `Holiday ${request.status === "denied" ? "rejected" : request.status}`,
-      detail: `${request.employeeName || request.employeeEmail} · ${request.siteName}`,
-      time: new Date(request.createdAt || request.startDate).getTime()
-    }));
-
-    const taskItems = tasks.slice(0, 3).map((task) => ({
-      id: `task-${task._id}`,
-      title: `Task ${task.status}`,
-      detail: `${task.employeeEmail} · ${task.siteName}`,
-      time: task._id ? Number.parseInt(String(task._id).slice(0, 8), 16) * 1000 : 0
-    }));
-
-    return [...attendanceItems, ...holidayItems, ...taskItems]
-      .sort((a, b) => b.time - a.time)
-      .slice(0, 6);
-  }, [attendance, holidayRequests, tasks]);
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -230,22 +203,6 @@ export default function ManagerOverviewPage() {
                   <strong>{pendingHolidayCount}</strong>
                 </div>
               </div>
-            </div>
-
-            <div className="create-site-form manager-overview-recent-card">
-              <h2>Recent Updates</h2>
-              {recentUpdates.length === 0 ? (
-                <p className="manager-overview-empty">No recent updates yet.</p>
-              ) : (
-                <div className="manager-overview-activity-list">
-                  {recentUpdates.map((item) => (
-                    <div key={item.id} className="manager-overview-activity-item">
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </section>
         </main>
