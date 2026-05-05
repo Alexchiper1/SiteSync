@@ -31,8 +31,6 @@ app.use(
 );
 // Parse JSON request bodies into req.body for routes that send application/json.
 app.use(express.json());
-// Serve files from the uploads/ folder at URLs like /uploads/filename so images/links work.
-app.use("/uploads", express.static("uploads"));
 
 // Stack feature routers on the shared api router
 api.use(usersAPI);

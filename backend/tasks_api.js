@@ -1,7 +1,7 @@
 import express from "express";
 import { ObjectId } from "mongodb";
 import { getDb } from "./db.js";
-import { cloudinary, hasCloudinaryConfig, upload } from "./uploadStorage.js";
+import { cloudinary, upload } from "./uploadStorage.js";
 
 const router = express.Router();
 
@@ -73,10 +73,7 @@ router.put("/tasks-complete/:taskId", upload.single("photo"), async (req, res) =
 
     const db = await getDb();
 
-    //Upload to Cloudinary. Local development without Cloudinary,keeps Multer's disk path so the image can still be served from the uploads folder.
-    const imagePath = hasCloudinaryConfig
-      ? await uploadTaskPhoto(req.file)
-      : req.file?.path || req.file?.filename || "";
+    const imagePath = await uploadTaskPhoto(req.file);
 
     // Task ids arrive from the URL as strings, but MongoDB stores _id as ObjectId, so the id is converted for the update query.
     await db.collection("tasks").updateOne(
