@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerOverviewPage.css";
@@ -8,34 +8,18 @@ import { apiUrl } from "../lib/api";
 export default function ManagerOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [sites, setSites] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [attendance, setAttendance] = useState([]);
-  const [holidayRequests, setHolidayRequests] = useState([]);
   const [message, setMessage] = useState({ text: "", type: "info" });
   const navigate = useNavigate();
 
   const loadOverviewData = useCallback(async () => {
-    const [sitesRes, tasksRes, attendanceRes, holidaysRes] = await Promise.all([
-      fetch(apiUrl(`/sites/${currentUser.email}`)),
-      fetch(apiUrl(`/manager-tasks/${currentUser.email}`)),
-      fetch(apiUrl(`/attendance/manager/${currentUser.email}`)),
-      fetch(apiUrl(`/holiday-requests/manager/${currentUser.email}`))
-    ]);
+    const sitesRes = await fetch(apiUrl(`/sites/${currentUser.email}`));
 
-    const [sitesData, tasksData, attendanceData, holidaysData] = await Promise.all([
-      sitesRes.json(),
-      tasksRes.json(),
-      attendanceRes.json(),
-      holidaysRes.json()
-    ]);
+    const sitesData = await sitesRes.json();
 
-    if (!sitesRes.ok || !tasksRes.ok || !attendanceRes.ok || !holidaysRes.ok) {
+    if (!sitesRes.ok) {
       setMessage({
         text:
           sitesData.msg ||
-          tasksData.msg ||
-          attendanceData.msg ||
-          holidaysData.msg ||
           "Could not load manager dashboard overview",
         type: "error"
       });
@@ -43,35 +27,11 @@ export default function ManagerOverviewPage() {
     }
 
     setSites(sitesData);
-    setTasks(tasksData);
-    setAttendance(attendanceData);
-    setHolidayRequests(holidaysData);
   }, [currentUser.email]);
 
   useEffect(() => {
     loadOverviewData();
   }, [loadOverviewData]);
-
-  const pendingHolidayCount = useMemo(
-    () => holidayRequests.filter((request) => request.status === "pending").length,
-    [holidayRequests]
-  );
-
-  const checkOutCount = useMemo(
-    () => attendance.filter((row) => Boolean(row.checkOutAt)).length,
-    [attendance]
-  );
-
-  const taskSummary = useMemo(() => {
-    return tasks.reduce(
-      (acc, task) => {
-        acc.total += 1;
-        acc[task.status] = (acc[task.status] || 0) + 1;
-        return acc;
-      },
-      { total: 0, assigned: 0, completed: 0, unable: 0 }
-    );
-  }, [tasks]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -108,7 +68,7 @@ export default function ManagerOverviewPage() {
           <div className="dashboard-header manager-overview-header">
             <h1>Hello {currentUser?.name?.split(" ")[0] || "Manager"}!</h1>
             <p className="manager-overview-subtitle">
-              Your overview for sites, employees, attendance, tasks, and leave requests.
+              Your overview for managed sites and quick actions.
             </p>
           </div>
 
@@ -125,32 +85,6 @@ export default function ManagerOverviewPage() {
               <p>Managed construction sites in your workspace.</p>
             </article>
 
-            <article className="manager-overview-stat-card">
-              <span>Pending Holidays</span>
-              <strong>{pendingHolidayCount}</strong>
-              <p>Leave requests waiting for review.</p>
-            </article>
-
-            <article className="manager-overview-stat-card">
-              <span>Today's Check-Ins</span>
-              <strong>{attendance.length}</strong>
-              <p>Attendance records created today.</p>
-            </article>
-
-            <article className="manager-overview-stat-card">
-              <span>Today's Check-Outs</span>
-              <strong>{checkOutCount}</strong>
-              <p>Employees who have checked out today.</p>
-            </article>
-
-            <article className="manager-overview-stat-card">
-              <span>Task Summary</span>
-              <strong>{taskSummary.total} Active Tasks</strong>
-              <p>
-                {taskSummary.assigned} assigned · {taskSummary.completed} completed ·{" "}
-                {taskSummary.unable} unable
-              </p>
-            </article>
           </section>
 
           <section className="create-site-form manager-overview-quick-actions">

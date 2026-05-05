@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeOverviewPage.css";
@@ -11,8 +11,6 @@ export default function EmployeeOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [mySites, setMySites] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [holidayRequests, setHolidayRequests] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedSite, setSelectedSite] = useState(null);
@@ -26,18 +24,6 @@ export default function EmployeeOverviewPage() {
     setMySites(await res.json());
   }, [currentUser.email]);
 
-  const loadTasks = useCallback(async () => {
-    const res = await fetch(apiUrl(`/tasks/${currentUser.email.trim().toLowerCase()}`));
-    setTasks(await res.json());
-  }, [currentUser.email]);
-
-  const loadHolidayRequests = useCallback(async () => {
-    const res = await fetch(
-      apiUrl(`/holiday-requests/employee/${currentUser.email.trim().toLowerCase()}`)
-    );
-    setHolidayRequests(await res.json());
-  }, [currentUser.email]);
-
   const loadAttendanceHistory = useCallback(async () => {
     const res = await fetch(
       apiUrl(`/attendance/employee-history/${currentUser.email.trim().toLowerCase()}`)
@@ -47,10 +33,8 @@ export default function EmployeeOverviewPage() {
 
   useEffect(() => {
     loadMySites();
-    loadTasks();
-    loadHolidayRequests();
     loadAttendanceHistory();
-  }, [loadAttendanceHistory, loadHolidayRequests, loadMySites, loadTasks]);
+  }, [loadAttendanceHistory, loadMySites]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -120,34 +104,6 @@ export default function EmployeeOverviewPage() {
     (row) => new Date(row.checkInAt).toDateString() === new Date().toDateString()
   );
 
-  const taskSummary = useMemo(() => {
-    return tasks.reduce(
-      (acc, task) => {
-        acc.total += 1;
-        if (task.status === "assigned") {
-          acc.pending += 1;
-        } else if (task.status === "completed") {
-          acc.completed += 1;
-        } else if (task.status === "unable") {
-          acc.unable += 1;
-        }
-        return acc;
-      },
-      { total: 0, pending: 0, completed: 0, unable: 0 }
-    );
-  }, [tasks]);
-
-  const holidaySummary = useMemo(() => {
-    return holidayRequests.reduce(
-      (acc, request) => {
-        acc.total += 1;
-        acc[request.status] = (acc[request.status] || 0) + 1;
-        return acc;
-      },
-      { total: 0, pending: 0, approved: 0, denied: 0 }
-    );
-  }, [holidayRequests]);
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -180,7 +136,7 @@ export default function EmployeeOverviewPage() {
           <div className="dashboard-header employee-overview-header">
             <h1>Hello {currentUser?.name?.split(" ")[0] || "Employee"}!</h1>
             <p className="employee-overview-subtitle">
-              Your overview for tasks, sites, holiday requests, and attendance.
+              Your overview for site access and attendance.
             </p>
           </div>
 
@@ -213,23 +169,6 @@ export default function EmployeeOverviewPage() {
               </p>
             </article>
 
-            <article className="employee-overview-stat-card">
-              <span>Task Summary</span>
-              <strong>{taskSummary.total} Total Tasks</strong>
-              <p>
-                {taskSummary.pending} pending · {taskSummary.completed} completed ·{" "}
-                {taskSummary.unable} unable
-              </p>
-            </article>
-
-            <article className="employee-overview-stat-card">
-              <span>Holiday Summary</span>
-              <strong>{holidaySummary.total} Requests</strong>
-              <p>
-                {holidaySummary.pending} pending · {holidaySummary.approved} approved ·{" "}
-                {holidaySummary.denied} rejected
-              </p>
-            </article>
           </section>
 
           <section className="create-site-form employee-overview-quick-actions">
