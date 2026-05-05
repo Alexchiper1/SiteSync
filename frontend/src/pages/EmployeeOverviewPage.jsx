@@ -7,7 +7,7 @@ import { apiUrl } from "../lib/api";
 
 export default function EmployeeOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [message, setMessage] = useState({ text: "", type: "info" });
+  const [message] = useState({ text: "", type: "info" });
   const [mySites, setMySites] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const navigate = useNavigate();
