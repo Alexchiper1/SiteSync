@@ -3,20 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeOverviewPage.css";
 import EmployeeSidebar from "../components/EmployeeSidebar";
-import SiteLiveMap from "../components/SiteLiveMap";
 import { apiUrl } from "../lib/api";
-import { haversineMeters } from "../utils/distance";
 
 export default function EmployeeOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [mySites, setMySites] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
-  const [selectedSiteId, setSelectedSiteId] = useState("");
-  const [selectedSite, setSelectedSite] = useState(null);
-  const [userPos, setUserPos] = useState(null);
-  const [distance, setDistance] = useState(null);
-  const [isWithin, setIsWithin] = useState(false);
   const navigate = useNavigate();
 
   const loadMySites = useCallback(async () => {
@@ -36,73 +29,7 @@ export default function EmployeeOverviewPage() {
     loadAttendanceHistory();
   }, [loadAttendanceHistory, loadMySites]);
 
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      return undefined;
-    }
-
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        setUserPos({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        });
-      },
-      () => {
-        setMessage({ text: "Please allow location access (GPS).", type: "error" });
-      },
-      { enableHighAccuracy: true }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
-
-  useEffect(() => {
-    if (!selectedSiteId && mySites.length > 0) {
-      setSelectedSiteId(mySites[0].siteId);
-    }
-  }, [mySites, selectedSiteId]);
-
-  useEffect(() => {
-    const loadSite = async () => {
-      if (!selectedSiteId) {
-        setSelectedSite(null);
-        setDistance(null);
-        setIsWithin(false);
-        return;
-      }
-
-      const res = await fetch(apiUrl(`/site/${selectedSiteId}`));
-      const site = await res.json();
-      setSelectedSite(site);
-    };
-
-    loadSite();
-  }, [selectedSiteId]);
-
-  useEffect(() => {
-    if (!selectedSite?.lat || !selectedSite?.lng || !userPos?.lat || !userPos?.lng) {
-      setDistance(null);
-      setIsWithin(false);
-      return;
-    }
-
-    const d = haversineMeters(
-      userPos.lat,
-      userPos.lng,
-      selectedSite.lat,
-      selectedSite.lng
-    );
-
-    setDistance(d);
-    const radius = Number(selectedSite.radiusMeters ?? 100);
-    setIsWithin(d <= radius);
-  }, [selectedSite, userPos]);
-
   const openAttendanceRecord = attendanceHistory.find((row) => !row.checkOutAt);
-  const todayAttendanceRecord = attendanceHistory.find(
-    (row) => new Date(row.checkInAt).toDateString() === new Date().toDateString()
-  );
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -160,12 +87,12 @@ export default function EmployeeOverviewPage() {
             <article className="employee-overview-stat-card">
               <span>Today's Site</span>
               <strong>
-                {selectedSite?.name || openAttendanceRecord?.siteName || mySites[0]?.siteName || "No site"}
+                {openAttendanceRecord?.siteName || mySites[0]?.siteName || "No site"}
               </strong>
               <p>
-                {selectedSite
-                  ? `${Number(selectedSite.radiusMeters ?? 100)}m allowed radius`
-                  : "Select or join a site to start tracking attendance."}
+                {openAttendanceRecord
+                  ? "Currently tracking attendance at this site."
+                  : "Join a site to start tracking attendance."}
               </p>
             </article>
 
@@ -189,59 +116,6 @@ export default function EmployeeOverviewPage() {
             </div>
           </section>
 
-          <section className="employee-overview-detail-grid">
-            <div className="create-site-form employee-overview-attendance-card">
-              <div className="employee-overview-section-header">
-                <h2>Attendance Snapshot</h2>
-                <select
-                  value={selectedSiteId}
-                  onChange={(e) => setSelectedSiteId(e.target.value)}
-                  className="employee-overview-site-select"
-                >
-                  <option value="">Select a site</option>
-                  {mySites.map((site) => (
-                    <option key={site._id} value={site.siteId}>
-                      {site.siteName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="employee-overview-feedback-grid">
-                <div className="employee-overview-feedback-card">
-                  <span>Current Location</span>
-                  <strong>{userPos ? "GPS ready" : "Waiting for GPS"}</strong>
-                </div>
-                <div className="employee-overview-feedback-card">
-                  <span>Radius Status</span>
-                  <strong>
-                    {selectedSite ? (isWithin ? "Within radius" : "Outside radius") : "No site selected"}
-                  </strong>
-                </div>
-                <div className="employee-overview-feedback-card">
-                  <span>Distance</span>
-                  <strong>{distance == null ? "..." : `${Math.round(distance)}m`}</strong>
-                </div>
-                <div className="employee-overview-feedback-card">
-                  <span>Today</span>
-                  <strong>
-                    {todayAttendanceRecord
-                      ? `${new Date(todayAttendanceRecord.checkInAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })} check-in`
-                      : "No record yet"}
-                  </strong>
-                </div>
-              </div>
-
-              {selectedSite && (
-                <div className="employee-overview-map-wrap">
-                  <SiteLiveMap site={selectedSite} userPos={userPos} size={280} />
-                </div>
-              )}
-            </div>
-          </section>
         </main>
       </div>
     </div>
