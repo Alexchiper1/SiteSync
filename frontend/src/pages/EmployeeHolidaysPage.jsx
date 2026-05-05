@@ -1,18 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../css/EmployeeOverviewPage.css";
 import "../css/EmployeeProfilePage.css";
 import "../css/EmployeeHolidaysPage.css";
 import EmployeeSidebar from "../components/EmployeeSidebar";
 import { apiUrl } from "../lib/api";
 
-const REQUESTS_PER_PAGE = 8;
-
 export default function EmployeeHolidaysPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [mySites, setMySites] = useState([]);
   const [holidayRequests, setHolidayRequests] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [holidayForm, setHolidayForm] = useState({
     siteId: "",
     startDate: "",
@@ -36,19 +33,6 @@ export default function EmployeeHolidaysPage() {
     loadMySites();
     loadHolidayRequests();
   }, [loadHolidayRequests, loadMySites]);
-
-  const totalPages = Math.max(1, Math.ceil(holidayRequests.length / REQUESTS_PER_PAGE));
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  const paginatedRequests = useMemo(() => {
-    const start = (currentPage - 1) * REQUESTS_PER_PAGE;
-    return holidayRequests.slice(start, start + REQUESTS_PER_PAGE);
-  }, [currentPage, holidayRequests]);
 
   const submitHolidayRequest = async () => {
     if (!holidayForm.siteId || !holidayForm.startDate || !holidayForm.endDate) {
@@ -166,7 +150,7 @@ export default function EmployeeHolidaysPage() {
               </div>
             ) : (
               <div className="holiday-request-list employee-holiday-list">
-                {paginatedRequests.map((request) => (
+                {holidayRequests.map((request) => (
                   <div key={request._id} className="task-card holiday-request-card employee-holiday-card">
                     <div className="employee-holiday-card-top">
                       <div>
@@ -196,37 +180,6 @@ export default function EmployeeHolidaysPage() {
                     )}
                   </div>
                 ))}
-              </div>
-            )}
-
-            {holidayRequests.length > 0 && (
-              <div className="employee-holiday-pagination">
-                <span className="employee-holiday-pagination-info">
-                  Showing {(currentPage - 1) * REQUESTS_PER_PAGE + 1}-
-                  {Math.min(currentPage * REQUESTS_PER_PAGE, holidayRequests.length)} of{" "}
-                  {holidayRequests.length}
-                </span>
-                <div className="employee-holiday-pagination-controls">
-                  <button
-                    type="button"
-                    className="cancel-action-btn compact-action-btn"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                  <span className="employee-holiday-pagination-page">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    type="button"
-                    className="compact-action-btn"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage >= totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
               </div>
             )}
           </section>

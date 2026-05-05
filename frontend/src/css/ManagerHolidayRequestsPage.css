@@ -84,36 +84,6 @@
   border-color: #bfdbfe;
 }
 
-.manager-holiday-pagination {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.manager-holiday-pagination-info {
-  color: #4b5563;
-  font-size: 0.92rem;
-}
-
-.manager-holiday-pagination-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.manager-holiday-pagination-controls .compact-action-btn {
-  width: auto;
-  min-width: 110px;
-  margin: 0;
-}
-
-.manager-holiday-pagination-page {
-  color: #374151;
-  font-weight: 600;
-}
-
 @media (max-width: 960px) {
   .manager-holiday-header {
     align-items: stretch;
@@ -121,20 +91,6 @@
 }
 
 @media (max-width: 640px) {
-  .manager-holiday-pagination,
-  .manager-holiday-pagination-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .manager-holiday-pagination-controls .compact-action-btn {
-    width: 100%;
-  }
-
-  .manager-holiday-pagination-page {
-    text-align: center;
-  }
-
   .manager-holiday-card-top,
   .manager-holiday-meta-row {
     flex-direction: column;

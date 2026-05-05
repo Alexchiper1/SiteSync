@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
 import "../css/ManagerHolidayRequestsPage.css";
 import ManagerSidebar from "../components/ManagerSidebar";
 import { apiUrl } from "../lib/api";
 
-const REQUESTS_PER_PAGE = 8;
 const STATUS_PENDING = "pending";
 const STATUS_APPROVED = "approved";
 const STATUS_DENIED = "denied";
@@ -16,7 +15,6 @@ export default function ManagerHolidayRequestsPage() {
   const [holidayRequests, setHolidayRequests] = useState([]);
   const [requestNotes, setRequestNotes] = useState({});
   const [message, setMessage] = useState({ text: "", type: "info" });
-  const [currentPage, setCurrentPage] = useState(1);
 
   const loadHolidayRequests = useCallback(async () => {
     const res = await fetch(apiUrl(`/holiday-requests/manager/${currentUser.email}`));
@@ -33,20 +31,6 @@ export default function ManagerHolidayRequestsPage() {
   useEffect(() => {
     loadHolidayRequests();
   }, [loadHolidayRequests]);
-
-  const totalPages = Math.max(1, Math.ceil(holidayRequests.length / REQUESTS_PER_PAGE));
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  const paginatedRequests = useMemo(() => {
-    // Render only the current page slice to keep the list manageable.
-    const start = (currentPage - 1) * REQUESTS_PER_PAGE;
-    return holidayRequests.slice(start, start + REQUESTS_PER_PAGE);
-  }, [currentPage, holidayRequests]);
 
   const updateHolidayRequest = async (requestId, status) => {
     const res = await fetch(apiUrl(`/holiday-requests/${requestId}`), {
@@ -74,9 +58,6 @@ export default function ManagerHolidayRequestsPage() {
       [requestId]: value
     }));
   };
-
-  const startItem = (currentPage - 1) * REQUESTS_PER_PAGE + 1;
-  const endItem = Math.min(currentPage * REQUESTS_PER_PAGE, holidayRequests.length);
 
   return (
     <div className="manager-section-page">
@@ -113,7 +94,7 @@ export default function ManagerHolidayRequestsPage() {
               </div>
             ) : (
               <div className="task-log manager-holiday-log">
-                {paginatedRequests.map((request) => (
+                {holidayRequests.map((request) => (
                   <div key={request._id} className="task-item manager-holiday-card">
                     <div className="manager-holiday-card-top">
                       <div>
@@ -176,35 +157,6 @@ export default function ManagerHolidayRequestsPage() {
                     )}
                   </div>
                 ))}
-              </div>
-            )}
-
-            {holidayRequests.length > 0 && (
-              <div className="manager-holiday-pagination">
-                <span className="manager-holiday-pagination-info">
-                  Showing {startItem}-{endItem} of {holidayRequests.length}
-                </span>
-                <div className="manager-holiday-pagination-controls">
-                  <button
-                    type="button"
-                    className="cancel-action-btn compact-action-btn"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                  <span className="manager-holiday-pagination-page">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    type="button"
-                    className="compact-action-btn"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage >= totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
               </div>
             )}
           </section>
