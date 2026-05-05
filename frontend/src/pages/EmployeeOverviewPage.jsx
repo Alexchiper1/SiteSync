@@ -8,14 +8,8 @@ import { apiUrl } from "../lib/api";
 export default function EmployeeOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [message] = useState({ text: "", type: "info" });
-  const [mySites, setMySites] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const navigate = useNavigate();
-
-  const loadMySites = useCallback(async () => {
-    const res = await fetch(apiUrl(`/employee-sites/${currentUser.email.trim().toLowerCase()}`));
-    setMySites(await res.json());
-  }, [currentUser.email]);
 
   const loadAttendanceHistory = useCallback(async () => {
     const res = await fetch(
@@ -25,9 +19,8 @@ export default function EmployeeOverviewPage() {
   }, [currentUser.email]);
 
   useEffect(() => {
-    loadMySites();
     loadAttendanceHistory();
-  }, [loadAttendanceHistory, loadMySites]);
+  }, [loadAttendanceHistory]);
 
   const openAttendanceRecord = attendanceHistory.find((row) => !row.checkOutAt);
 
@@ -83,19 +76,6 @@ export default function EmployeeOverviewPage() {
                   : "No active check-in right now."}
               </p>
             </article>
-
-            <article className="employee-overview-stat-card">
-              <span>Today's Site</span>
-              <strong>
-                {openAttendanceRecord?.siteName || mySites[0]?.siteName || "No site"}
-              </strong>
-              <p>
-                {openAttendanceRecord
-                  ? "Currently tracking attendance at this site."
-                  : "Join a site to start tracking attendance."}
-              </p>
-            </article>
-
           </section>
 
           <section className="create-site-form employee-overview-quick-actions">
