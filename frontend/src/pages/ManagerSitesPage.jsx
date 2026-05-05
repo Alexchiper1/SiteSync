@@ -19,7 +19,6 @@ export default function ManagerSitesPage() {
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [site, setSite] = useState(emptySiteForm);
   const [sites, setSites] = useState([]);
-  const [deleteSiteId, setDeleteSiteId] = useState("");
 
   const loadSites = useCallback(async () => {
     const res = await fetch(apiUrl(`/sites/${currentUser.email}`));
@@ -63,55 +62,12 @@ export default function ManagerSitesPage() {
     }
   };
 
-  const deleteSite = async (siteId) => {
-    const res = await fetch(apiUrl(`/sites/${siteId}`), {
-      method: "DELETE"
-    });
-
-    const data = await res.json();
-    setMessage({ text: data.msg, type: res.ok ? "success" : "error" });
-
-    if (res.ok) {
-      setDeleteSiteId("");
-      loadSites();
-    }
-  };
-
   return (
     <div className="manager-section-page">
       <div className="manager-section-layout">
         <ManagerSidebar />
 
         <main className="manager-section-main">
-          {deleteSiteId && (
-            <div className="manager-modal-overlay" onClick={() => setDeleteSiteId("")}>
-              <div
-                className="manager-modal-card"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="manager-modal-badge">Delete Site</span>
-                <h3>Delete this site?</h3>
-                <p>This will remove the site and its related data from the dashboard.</p>
-                <div className="task-actions-row">
-                  <button
-                    className="delete-site-btn"
-                    type="button"
-                    onClick={() => deleteSite(deleteSiteId)}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="cancel-action-btn"
-                    type="button"
-                    onClick={() => setDeleteSiteId("")}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="dashboard-header">
             <h1>Manager Sites</h1>
             <p className="manager-sites-subtitle">
@@ -194,27 +150,6 @@ export default function ManagerSitesPage() {
           ) : (
             sites.map((siteItem) => (
               <div key={siteItem._id} className="site-card">
-                <div className="site-card-actions">
-                  <button
-                    className="site-icon-button delete-site-icon"
-                    type="button"
-                    aria-label={`Delete ${siteItem.name}`}
-                    title="Delete site"
-                    onClick={() => setDeleteSiteId(siteItem._id)}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      className="site-icon-svg"
-                    >
-                      <path
-                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 12c-1.1 0-2-.9-2-2V8h12v11c0 1.1-.9 2-2 2H8z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
                 <strong>{siteItem.name}</strong>
                 <p>{siteItem.location}</p>
 

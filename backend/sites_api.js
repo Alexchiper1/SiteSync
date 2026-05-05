@@ -102,35 +102,5 @@ router.get("/employee-sites/:email", async (req, res) => {
   res.json(sites);
 });
 
-// Delete a site,
-router.delete("/sites/:siteId", async (req, res) => {
-  try {
-    const db = await getDb();
-
-    // The sites uses ObjectId for the _id, so the URL string is converted, before deletion.
-    await db.collection("sites").deleteOne({
-      _id: new ObjectId(req.params.siteId)
-    });
-
-    // Related collections store siteId as a string
-    await db.collection("siteMembers").deleteMany({
-      siteId: req.params.siteId
-    });
-
-    await db.collection("tasks").deleteMany({
-      siteId: req.params.siteId
-    });
-
-    await db.collection("holidayRequests").deleteMany({
-      siteId: req.params.siteId
-    });
-
-    res.json({ msg: "Site deleted" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Error deleting site" });
-  }
-});
-
 // app.js imports this router and mounts it with the other API routers.
 export default router;
