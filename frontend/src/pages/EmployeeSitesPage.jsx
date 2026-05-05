@@ -156,9 +156,6 @@ export default function EmployeeSitesPage() {
           <section className="create-site-form">
             <div className="employee-sites-section-header">
               <h2>Assigned Sites</h2>
-              <span className="employee-sites-count">
-                {mySites.length} {mySites.length === 1 ? "site" : "sites"}
-              </span>
             </div>
 
             {mySites.length === 0 ? (

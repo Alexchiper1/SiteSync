@@ -8,7 +8,6 @@ import { apiUrl } from "../lib/api";
 export default function ManagerOverviewPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [sites, setSites] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [holidayRequests, setHolidayRequests] = useState([]);
@@ -16,27 +15,24 @@ export default function ManagerOverviewPage() {
   const navigate = useNavigate();
 
   const loadOverviewData = useCallback(async () => {
-    const [sitesRes, employeesRes, tasksRes, attendanceRes, holidaysRes] = await Promise.all([
+    const [sitesRes, tasksRes, attendanceRes, holidaysRes] = await Promise.all([
       fetch(apiUrl(`/sites/${currentUser.email}`)),
-      fetch(apiUrl(`/manager-employees/${currentUser.email}`)),
       fetch(apiUrl(`/manager-tasks/${currentUser.email}`)),
       fetch(apiUrl(`/attendance/manager/${currentUser.email}`)),
       fetch(apiUrl(`/holiday-requests/manager/${currentUser.email}`))
     ]);
 
-    const [sitesData, employeesData, tasksData, attendanceData, holidaysData] = await Promise.all([
+    const [sitesData, tasksData, attendanceData, holidaysData] = await Promise.all([
       sitesRes.json(),
-      employeesRes.json(),
       tasksRes.json(),
       attendanceRes.json(),
       holidaysRes.json()
     ]);
 
-    if (!sitesRes.ok || !employeesRes.ok || !tasksRes.ok || !attendanceRes.ok || !holidaysRes.ok) {
+    if (!sitesRes.ok || !tasksRes.ok || !attendanceRes.ok || !holidaysRes.ok) {
       setMessage({
         text:
           sitesData.msg ||
-          employeesData.msg ||
           tasksData.msg ||
           attendanceData.msg ||
           holidaysData.msg ||
@@ -47,7 +43,6 @@ export default function ManagerOverviewPage() {
     }
 
     setSites(sitesData);
-    setEmployees(employeesData);
     setTasks(tasksData);
     setAttendance(attendanceData);
     setHolidayRequests(holidaysData);
