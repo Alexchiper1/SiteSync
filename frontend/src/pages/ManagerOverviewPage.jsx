@@ -131,12 +131,6 @@ export default function ManagerOverviewPage() {
             </article>
 
             <article className="manager-overview-stat-card">
-              <span>Total Employees</span>
-              <strong>{employees.length}</strong>
-              <p>Employees currently assigned across your sites.</p>
-            </article>
-
-            <article className="manager-overview-stat-card">
               <span>Pending Holidays</span>
               <strong>{pendingHolidayCount}</strong>
               <p>Leave requests waiting for review.</p>
