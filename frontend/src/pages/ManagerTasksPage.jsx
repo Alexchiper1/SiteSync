@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../css/ManagerOverviewPage.css";
 import "../css/ManagerProfilePage.css";
@@ -10,7 +10,6 @@ export default function ManagerTasksPage() {
   const [currentUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [searchParams] = useSearchParams();
   const [sites, setSites] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [message, setMessage] = useState({ text: "", type: "info" });
   const [taskForm, setTaskForm] = useState({
@@ -20,23 +19,20 @@ export default function ManagerTasksPage() {
   });
 
   const loadTaskData = useCallback(async () => {
-    const [sitesRes, employeesRes, tasksRes] = await Promise.all([
+    const [sitesRes, tasksRes] = await Promise.all([
       fetch(apiUrl(`/sites/${currentUser.email}`)),
-      fetch(apiUrl(`/manager-employees/${currentUser.email}`)),
       fetch(apiUrl(`/manager-tasks/${currentUser.email}`))
     ]);
 
-    const [sitesData, employeesData, tasksData] = await Promise.all([
+    const [sitesData, tasksData] = await Promise.all([
       sitesRes.json(),
-      employeesRes.json(),
       tasksRes.json()
     ]);
 
-    if (!sitesRes.ok || !employeesRes.ok || !tasksRes.ok) {
+    if (!sitesRes.ok || !tasksRes.ok) {
       setMessage({
         text:
           sitesData.msg ||
-          employeesData.msg ||
           tasksData.msg ||
           "Could not load manager tasks data",
         type: "error"
@@ -45,7 +41,6 @@ export default function ManagerTasksPage() {
     }
 
     setSites(sitesData);
-    setEmployees(employeesData);
     setTasks(tasksData);
   }, [currentUser.email]);
 
@@ -60,21 +55,11 @@ export default function ManagerTasksPage() {
     }
   }, [searchParams]);
 
-  const filteredEmployeesForForm = useMemo(() => {
-    if (!taskForm.siteId) {
-      return employees;
-    }
-
-    return employees.filter((employee) =>
-      employee.joinedSites?.some((site) => site.siteId === taskForm.siteId)
-    );
-  }, [employees, taskForm.siteId]);
-
   const createTask = async (e) => {
     e.preventDefault();
 
     if (!taskForm.siteId || !taskForm.employeeEmail || !taskForm.description.trim()) {
-      setMessage({ text: "Choose a site, employee, and task description.", type: "error" });
+      setMessage({ text: "Choose a site, enter an employee email, and add a task description.", type: "error" });
       return;
     }
 
@@ -147,7 +132,9 @@ export default function ManagerTasksPage() {
                 ))}
               </select>
 
-              <select
+              <input
+                type="email"
+                placeholder="Employee email"
                 value={taskForm.employeeEmail}
                 onChange={(e) =>
                   setTaskForm((prev) => ({
@@ -155,14 +142,7 @@ export default function ManagerTasksPage() {
                     employeeEmail: e.target.value
                   }))
                 }
-              >
-                <option value="">Select employee</option>
-                {filteredEmployeesForForm.map((employee) => (
-                  <option key={employee.email} value={employee.email}>
-                    {employee.name} ({employee.email})
-                  </option>
-                ))}
-              </select>
+              />
 
               <textarea
                 className="manager-task-textarea"
