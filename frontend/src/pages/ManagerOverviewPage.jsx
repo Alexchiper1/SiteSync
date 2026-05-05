@@ -182,29 +182,6 @@ export default function ManagerOverviewPage() {
             </div>
           </section>
 
-          <section className="manager-overview-detail-grid">
-            <div className="create-site-form manager-overview-summary-card">
-              <h2>Operations Snapshot</h2>
-              <div className="manager-overview-feedback-grid">
-                <div className="manager-overview-feedback-card">
-                  <span>Employees checked in</span>
-                  <strong>{attendance.filter((row) => !row.checkOutAt).length}</strong>
-                </div>
-                <div className="manager-overview-feedback-card">
-                  <span>Employees checked out</span>
-                  <strong>{checkOutCount}</strong>
-                </div>
-                <div className="manager-overview-feedback-card">
-                  <span>Sites with teams</span>
-                  <strong>{new Set(employees.map((employee) => employee.assignedSite)).size}</strong>
-                </div>
-                <div className="manager-overview-feedback-card">
-                  <span>Holiday reviews left</span>
-                  <strong>{pendingHolidayCount}</strong>
-                </div>
-              </div>
-            </div>
-          </section>
         </main>
       </div>
     </div>
